@@ -1,0 +1,83 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageTitle from "../components/PageTitle.astro";
+import { site } from "../content/site";
+import { formatLongDate, formatTimeRange } from "../lib/helpers";
+
+const { schedule } = site;
+---
+
+<BaseLayout title={schedule.title}>
+  <div class="container">
+    <PageTitle title={schedule.title} intro={schedule.intro} />
+    <div class="events">
+      {
+        schedule.events.map((e) => (
+          <article class="card event" id={e.id} data-event={e.id} data-date={e.date} data-start={e.start} data-end={e.end}>
+            <h2 class="script">{e.name}</h2>
+            <p class="label">{formatLongDate(e.date)}</p>
+            <p class="time">{formatTimeRange(e.start, e.end)}</p>
+            <div class="divider" aria-hidden="true"><span></span></div>
+            <dl>
+              <div>
+                <dt class="label">Where</dt>
+                <dd>
+                  {e.venue}
+                  <br />
+                  <span class="small">{e.address}</span>
+                </dd>
+              </div>
+              <div>
+                <dt class="label">Attire</dt>
+                <dd>{e.dressCode}</dd>
+              </div>
+              {e.notes && (
+                <div>
+                  <dt class="label">Notes</dt>
+                  <dd>{e.notes}</dd>
+                </div>
+              )}
+            </dl>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .events {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .event {
+    text-align: center;
+  }
+
+  .event > .label {
+    margin-bottom: var(--space-1);
+  }
+
+  .time {
+    font-style: italic;
+  }
+
+  dl {
+    margin: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  dt {
+    margin-bottom: 0.25rem;
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  .small {
+    font-size: var(--text-sm);
+  }
+</style>

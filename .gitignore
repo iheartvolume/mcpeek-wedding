@@ -1,0 +1,23 @@
+# Build output and dependencies
+dist/
+node_modules/
+.astro/
+
+# Environment variables and secrets — never commit these
+.env
+.env.*
+!.env.example
+
+# Original font source files (only the converted .woff2 is committed)
+fonts-source/
+
+# Real guest data must never be committed (only fictional seed data)
+data/private/
+*.csv
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+npm-debug.log*

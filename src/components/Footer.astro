@@ -1,0 +1,43 @@
+---
+import { site } from "../content/site";
+import { coupleNames, formatDate, isPlaceholder } from "../lib/helpers";
+
+const email = site.contactEmail;
+---
+
+<footer class="site-footer">
+  <div class="divider" aria-hidden="true"><span></span></div>
+  <p class="names script">{coupleNames}</p>
+  <p class="label">{formatDate(site.weddingDate)}</p>
+  <p class="contact">
+    {site.footer.contactLabel}{" "}
+    {isPlaceholder(email) ? <span>{email}</span> : <a href={`mailto:${email}`}>{email}</a>}
+  </p>
+</footer>
+
+<style>
+  .site-footer {
+    text-align: center;
+    padding: var(--space-3) var(--space-2) var(--space-4);
+    color: var(--text-on-page);
+  }
+
+  .divider {
+    color: var(--accent);
+    margin-top: 0;
+  }
+
+  .names {
+    font-size: 2.25rem;
+    line-height: 1.2;
+    margin-bottom: var(--space-1);
+  }
+
+  .label {
+    margin-bottom: var(--space-2);
+  }
+
+  .contact {
+    font-size: var(--text-sm);
+  }
+</style>

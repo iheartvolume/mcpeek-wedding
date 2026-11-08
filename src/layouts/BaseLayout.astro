@@ -1,0 +1,39 @@
+---
+import "../styles/tokens.css";
+import "../styles/global.css";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import { site } from "../content/site";
+import { coupleNames, href } from "../lib/helpers";
+import natiqueUrl from "../assets/fonts/natiques-regular.woff2?url";
+import serifUrl from "../assets/fonts/libre-baskerville-latin-400-normal.woff2?url";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = site.meta.description } = Astro.props;
+const fullTitle = title ? `${title} · ${coupleNames}` : coupleNames;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={href("/favicon.svg")} />
+    <link rel="preload" href={natiqueUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={serifUrl} as="font" type="font/woff2" crossorigin />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{site.meta.skipToContent}</a>
+    <Nav />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

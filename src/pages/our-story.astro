@@ -1,0 +1,55 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageTitle from "../components/PageTitle.astro";
+import { site } from "../content/site";
+import { href } from "../lib/helpers";
+
+const { story } = site;
+---
+
+<BaseLayout title={story.title}>
+  <div class="container">
+    <PageTitle title={story.title} intro={story.intro} />
+    <ol class="timeline">
+      {
+        story.milestones.map((m) => (
+          <li class="card milestone">
+            <p class="label when">{m.when}</p>
+            <h2 class="script">{m.title}</h2>
+            {m.photo ? (
+              <img src={href(m.photo)} alt={m.photoAlt} loading="lazy" decoding="async" class="photo" />
+            ) : (
+              <div class="frame-placeholder photo">{m.photoAlt}</div>
+            )}
+            <p>{m.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</BaseLayout>
+
+<style>
+  .timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .milestone {
+    text-align: center;
+  }
+
+  .when {
+    margin-bottom: var(--space-1);
+  }
+
+  .photo {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    margin: var(--space-3) 0;
+  }
+</style>

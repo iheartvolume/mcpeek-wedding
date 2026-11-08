@@ -1,0 +1,31 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../content/site";
+
+const { registry } = site;
+---
+
+<BaseLayout title={registry.title}>
+  <div class="container">
+    <section class="card card-center" aria-labelledby="registry-title">
+      <h1 id="registry-title" class="script">{registry.title}</h1>
+      <div class="divider" aria-hidden="true"><span></span></div>
+      <p>{registry.message}</p>
+      {
+        registry.url && (
+          <p class="cta">
+            <a class="button" href={registry.url} rel="noopener">
+              {registry.buttonLabel}
+            </a>
+          </p>
+        )
+      }
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .cta {
+    margin-top: var(--space-3);
+  }
+</style>

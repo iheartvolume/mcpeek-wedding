@@ -1,0 +1,24 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../content/site";
+import { href } from "../lib/helpers";
+
+const { notFound } = site;
+---
+
+<BaseLayout title={notFound.title}>
+  <div class="container">
+    <section class="card card-center" aria-labelledby="nf-title">
+      <h1 id="nf-title" class="script">{notFound.heading}</h1>
+      <div class="divider" aria-hidden="true"><span></span></div>
+      <p>{notFound.message}</p>
+      <p class="cta"><a class="button" href={href("/")}>{notFound.linkLabel}</a></p>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .cta {
+    margin-top: var(--space-3);
+  }
+</style>

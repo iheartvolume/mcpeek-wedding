@@ -1,0 +1,322 @@
+/* ==========================================================================
+   GLOBAL STYLES — layout and shared classes. Uses tokens.css variables only.
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-page);
+  color: var(--text-on-page);
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Candlelit vignette: deeper maroon toward the edges. Fixed layer so it
+   doesn't repaint on scroll (works on iOS where background-attachment fails). */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 120% 90% at 50% 35%, transparent 35%, var(--surface-page-edge) 100%),
+    var(--surface-page);
+}
+
+img,
+svg,
+iframe {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+  border-radius: var(--radius);
+}
+
+.card :focus-visible {
+  outline-color: var(--focus-ring-on-card);
+}
+
+/* --- Typography --------------------------------------------------------- */
+h1,
+h2,
+h3 {
+  margin: 0 0 var(--space-2);
+  line-height: 1.15;
+  font-weight: 400;
+}
+
+.script {
+  font-family: var(--font-script);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+h1.script {
+  font-size: var(--heading-lg);
+}
+
+h2.script {
+  font-size: var(--heading-md);
+}
+
+/* Small caps label used for subheadings, dates, and eyebrows. */
+.label {
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Any number inside a script heading must use the serif font. */
+.num {
+  font-family: var(--font-serif);
+  font-size: 0.6em;
+  letter-spacing: 0.02em;
+}
+
+p {
+  margin: 0 0 var(--space-2);
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+/* --- Layout ------------------------------------------------------------- */
+main {
+  flex: 1;
+  width: 100%;
+  padding: var(--space-3) var(--space-2) var(--space-5);
+}
+
+.container {
+  width: 100%;
+  max-width: var(--content-width);
+  margin-inline: auto;
+}
+
+.container-wide {
+  width: 100%;
+  max-width: var(--wide-width);
+  margin-inline: auto;
+}
+
+.stack > * + * {
+  margin-top: var(--space-3);
+}
+
+.page-title {
+  text-align: center;
+  color: var(--text-on-page);
+  margin-bottom: var(--space-3);
+}
+
+.page-title p {
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+/* --- Card: peach surface inside a thin terracotta frame ---------------- */
+.card {
+  position: relative;
+  background-color: var(--surface-card);
+  color: var(--text-on-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius);
+  padding: var(--space-4) var(--space-3);
+  isolation: isolate;
+}
+
+/* Inner hairline frame, echoing the save the date's bordered card. */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Faint paper grain (grayscale noise, low opacity — inherits the card color). */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+  opacity: 0.07;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.card h2,
+.card h3 {
+  color: var(--text-on-card);
+}
+
+.card-center {
+  text-align: center;
+}
+
+/* A thin divider with a small center diamond. */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) auto;
+  max-width: 12rem;
+  color: var(--border-card);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: currentColor;
+}
+
+.divider span {
+  width: 6px;
+  height: 6px;
+  transform: rotate(45deg);
+  background: currentColor;
+}
+
+/* --- Buttons ------------------------------------------------------------ */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--text-on-card);
+  background: transparent;
+  border: 1px solid var(--text-on-card);
+  border-radius: var(--radius);
+  transition: background-color var(--duration-soft) var(--ease-soft),
+    color var(--duration-soft) var(--ease-soft);
+}
+
+.button:hover {
+  background-color: var(--text-on-card);
+  color: var(--surface-card);
+}
+
+.button-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: stretch;
+}
+
+/* Placeholder frames (photos, map). */
+.frame-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-3);
+  border: 1px dashed var(--border-card);
+  color: var(--text-on-card);
+  font-style: italic;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: var(--space-1);
+  left: var(--space-1);
+  z-index: 100;
+  padding: var(--space-1) var(--space-2);
+  background: var(--surface-card);
+  color: var(--text-on-card);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* --- Larger screens ----------------------------------------------------- */
+@media (min-width: 40rem) {
+  :root {
+    --heading-xl: 4.5rem;
+    --heading-lg: 3.25rem;
+    --heading-md: 2.5rem;
+  }
+
+  body {
+    font-size: var(--text-lg);
+  }
+
+  main {
+    padding: var(--space-4) var(--space-3) var(--space-5);
+  }
+
+  .card {
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .button-row {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+/* --- Reduced motion: no transitions or animations anywhere ------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

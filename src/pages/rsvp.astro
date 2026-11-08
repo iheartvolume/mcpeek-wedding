@@ -1,0 +1,17 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { site } from "../content/site";
+
+const { rsvp } = site;
+---
+
+<BaseLayout title={rsvp.title}>
+  <div class="container">
+    <section class="card card-center" aria-labelledby="rsvp-title">
+      <p class="label">{rsvp.title}</p>
+      <h1 id="rsvp-title" class="script">{rsvp.heading}</h1>
+      <div class="divider" aria-hidden="true"><span></span></div>
+      <p>{rsvp.message}</p>
+    </section>
+  </div>
+</BaseLayout>

@@ -1,0 +1,75 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageTitle from "../components/PageTitle.astro";
+import { site } from "../content/site";
+import { isPlaceholder } from "../lib/helpers";
+
+const { faqs, contactEmail } = site;
+---
+
+<BaseLayout title={faqs.title}>
+  <div class="container">
+    <PageTitle title={faqs.title} intro={faqs.intro} />
+    <section class="card">
+      {
+        faqs.items.map((item) => (
+          <details>
+            <summary>{item.q}</summary>
+            <p>{item.a}</p>
+          </details>
+        ))
+      }
+      <p class="contact">
+        {isPlaceholder(contactEmail) ? contactEmail : <a href={`mailto:${contactEmail}`}>{contactEmail}</a>}
+      </p>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  details {
+    border-bottom: 1px solid var(--border-card);
+  }
+
+  details:first-of-type {
+    border-top: 1px solid var(--border-card);
+  }
+
+  summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 48px;
+    padding: var(--space-2) 0;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 700;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary::after {
+    content: "+";
+    flex-shrink: 0;
+    font-weight: 400;
+    font-size: 1.4em;
+    line-height: 1;
+    transition: transform var(--duration-soft) var(--ease-soft);
+  }
+
+  details[open] summary::after {
+    transform: rotate(45deg);
+  }
+
+  details p {
+    padding-bottom: var(--space-2);
+  }
+
+  .contact {
+    margin-top: var(--space-3);
+    text-align: center;
+  }
+</style>

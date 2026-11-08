@@ -1,0 +1,100 @@
+/* ==========================================================================
+   DESIGN TOKENS — the one place for every color and font on the site.
+   Change a value here and it changes everywhere. Components never use raw
+   hex codes or font names; they use the variables below.
+   ========================================================================== */
+
+/* --- Fonts ---------------------------------------------------------------
+   Natique (script) has NO numerals. Its file has had digits removed and its
+   @font-face only covers letters, so any number automatically falls back to
+   Libre Baskerville. Still: keep numbers out of headings where you can.   */
+@font-face {
+  font-family: "Natiques";
+  src: url("../assets/fonts/natiques-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  /* Letters and punctuation only. Digits (U+0030-0039) are excluded on purpose. */
+  unicode-range: U+0020-002F, U+003A-007E, U+00A0-017F, U+2013-2014, U+2018-2019, U+201C-201D, U+2026;
+}
+
+@font-face {
+  font-family: "Libre Baskerville";
+  src: url("../assets/fonts/libre-baskerville-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Libre Baskerville";
+  src: url("../assets/fonts/libre-baskerville-latin-400-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Libre Baskerville";
+  src: url("../assets/fonts/libre-baskerville-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* --- Brand colors (from the save the date) --------------------------- */
+  --color-terracotta: #bf704d;   /* card border and frame */
+  --color-peach: #ffbea1;        /* card surface */
+  --color-maroon: #5c1313;       /* page background */
+  --color-text-on-peach: #622e2a;/* all text on peach */
+
+  /* --- Supporting colors — OWNER REVIEW: starting values, tweak freely -- */
+  --color-cream: #f4e7d3;        /* warm off-white for text on maroon */
+  --color-gold: #c9a45c;         /* muted antique gold (wax seal); use sparingly */
+  --color-maroon-deep: #3d0b0b;  /* deeper maroon for vignette and glow edges */
+
+  /* --- Leaf palette (used by the falling leaves in Step 2) ------------- */
+  --leaf-1: #c8642f;             /* warm orange */
+  --leaf-2: #e0805e;             /* coral */
+  --leaf-3: #c9a45c;             /* gold */
+  --leaf-4: #8e2a1c;             /* deep red */
+  --leaf-5: #a8482a;             /* rust */
+
+  /* --- Semantic aliases: what components actually use ------------------ */
+  --surface-page: var(--color-maroon);
+  --surface-page-edge: var(--color-maroon-deep);
+  --surface-card: var(--color-peach);
+  --border-card: var(--color-terracotta);
+  --text-on-card: var(--color-text-on-peach);
+  --text-on-page: var(--color-cream);
+  --accent: var(--color-gold);
+  --focus-ring: var(--color-gold);
+  --focus-ring-on-card: var(--color-text-on-peach);
+
+  /* --- Font families --------------------------------------------------- */
+  --font-script: "Natiques", "Libre Baskerville", Georgia, serif;
+  --font-serif: "Libre Baskerville", Georgia, "Times New Roman", serif;
+
+  /* --- Type scale (mobile first; grows on larger screens in global.css) */
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --heading-xl: 3.25rem;
+  --heading-lg: 2.5rem;
+  --heading-md: 2rem;
+
+  /* --- Spacing and shape ----------------------------------------------- */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 4rem;
+  --content-width: 44rem;
+  --wide-width: 64rem;
+  --radius: 2px;
+
+  /* --- Motion ---------------------------------------------------------- */
+  --ease-soft: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --duration-soft: 400ms;
+}

@@ -1,0 +1,139 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PageTitle from "../components/PageTitle.astro";
+import { site } from "../content/site";
+
+const { travel } = site;
+---
+
+<BaseLayout title={travel.title}>
+  <div class="container stack">
+    <PageTitle title={travel.title} intro={travel.intro} />
+
+    <section class="card" aria-labelledby="stay">
+      <h2 id="stay" class="script center">{travel.accommodationsTitle}</h2>
+      <p class="center">{travel.accommodationsIntro}</p>
+      <ul class="list">
+        {
+          travel.hotels.map((h) => (
+            <li>
+              <h3 class="item-name">{h.url ? <a href={h.url}>{h.name}</a> : h.name}</h3>
+              <p class="label meta">
+                {h.distance} · {h.price}
+              </p>
+              <p>{h.note}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="card" aria-labelledby="getting-there">
+      <h2 id="getting-there" class="script center">{travel.gettingThereTitle}</h2>
+      <ul class="list">
+        {
+          travel.gettingThere.map((g) => (
+            <li>
+              <h3 class="item-name">{g.heading}</h3>
+              <p>{g.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="card" aria-labelledby="explore">
+      <h2 id="explore" class="script center">{travel.exploreTitle}</h2>
+      {
+        travel.exploreGroups.map((group) => (
+          <div class="group">
+            <h3 class="label center">{group.category}</h3>
+            <ul class="list">
+              {group.items.map((item) => (
+                <li>
+                  <p class="item-name">{item.url ? <a href={item.url}>{item.name}</a> : item.name}</p>
+                  <p>{item.note}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </section>
+
+    <section class="card" aria-labelledby="map">
+      <h2 id="map" class="script center">{travel.mapTitle}</h2>
+      <div class="map-frame">
+        {
+          travel.mapEmbedUrl ? (
+            <iframe src={travel.mapEmbedUrl} title={travel.mapTitle} loading="lazy" referrerpolicy="no-referrer-when-downgrade" />
+          ) : (
+            <div class="frame-placeholder">{travel.mapPlaceholder}</div>
+          )
+        }
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .center {
+    text-align: center;
+  }
+
+  .list {
+    list-style: none;
+    margin: var(--space-3) 0 0;
+    padding: 0;
+  }
+
+  .list > li + li {
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-card);
+  }
+
+  .item-name {
+    font-family: var(--font-serif);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+  }
+
+  .meta {
+    margin-bottom: var(--space-1);
+  }
+
+  .group + .group {
+    margin-top: var(--space-4);
+  }
+
+  .group h3 {
+    margin-bottom: 0;
+  }
+
+  .map-frame {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    margin-top: var(--space-3);
+    border: 1px solid var(--border-card);
+  }
+
+  .map-frame > * {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .map-frame .frame-placeholder {
+    border: 0;
+  }
+
+  @media (min-width: 40rem) {
+    .map-frame {
+      aspect-ratio: 16 / 10;
+    }
+  }
+</style>
