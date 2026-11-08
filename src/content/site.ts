@@ -47,6 +47,23 @@ export const site: SiteContent = {
   // A short notice shown at the top of the home page. Leave "" to hide it.
   announcement: "",
 
+  /* --- Opening animation (first visit per browser session) ------------ */
+  intro: {
+    // Swap this file for the real seal (transparent PNG or SVG) and update the path.
+    sealImage: "/images/seal.svg",
+    openLabel: "Open the invitation",
+    openHint: "Tap to open",
+    skipLabel: "Skip",
+  },
+
+  /* --- Falling leaves (home page) --------------------------------------- */
+  leaves: {
+    pileLabel: "Leaf pile. Press to jump in.",
+    // Optional: paths to transparent leaf PNGs in /public/images to use
+    // instead of the drawn leaves, e.g. ["/images/leaf-1.png", "/images/leaf-2.png"].
+    spriteImages: [],
+  },
+
   /* --- Navigation -------------------------------------------------------- */
   nav: [
     { label: "Home", path: "/" },

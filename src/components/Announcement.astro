@@ -1,0 +1,27 @@
+---
+/* Banner at the top of the home page. Hidden when site.announcement is "". */
+import { site } from "../content/site";
+
+const text = site.announcement.trim();
+---
+
+{
+  text && (
+    <aside class="announcement" aria-label="Announcement">
+      <p>{text}</p>
+    </aside>
+  )
+}
+
+<style>
+  .announcement {
+    max-width: var(--content-width);
+    margin: 0 auto var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    text-align: center;
+    color: var(--text-on-page);
+    border-top: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+    font-style: italic;
+  }
+</style>

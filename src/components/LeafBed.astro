@@ -1,0 +1,83 @@
+---
+/* The pile "buttons" at the bottom of the home page. */
+import { site } from "../content/site";
+import { href } from "../lib/helpers";
+
+const sprites = site.leaves.spriteImages.map((p) => href(p));
+---
+
+<div class="leaf-bed" data-sprites={JSON.stringify(sprites)}>
+  {[0, 1, 2].map(() => <button type="button" class="pile" aria-label={site.leaves.pileLabel}></button>)}
+</div>
+
+<script>
+  import { LeafField } from "../scripts/leaves";
+
+  const canvas = document.querySelector<HTMLCanvasElement>(".leaf-canvas");
+  const bed = document.querySelector<HTMLElement>(".leaf-bed");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (canvas && bed) {
+    const piles = Array.from(bed.querySelectorAll<HTMLButtonElement>(".pile"));
+    if (reduced) {
+      // Static piles only: nothing to press.
+      piles.forEach((p) => {
+        p.tabIndex = -1;
+        p.setAttribute("aria-hidden", "true");
+        p.disabled = true;
+      });
+    }
+    const field = new LeafField({
+      canvas,
+      pileElements: piles,
+      spriteUrls: JSON.parse(bed.dataset.sprites || "[]"),
+      reducedMotion: reduced,
+    });
+
+    field.init().then(() => {
+      const root = document.documentElement;
+      // If the opening animation is playing, start the leaves when the seal opens.
+      if (root.classList.contains("intro-play") && !root.dataset.introOpened) {
+        document.addEventListener("kp:intro-open", () => field.beginSeason(), { once: true });
+      } else {
+        field.beginSeason();
+      }
+    });
+  }
+</script>
+
+<style>
+  .leaf-bed {
+    position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 10rem;
+    margin: var(--space-3) auto calc(-1 * var(--space-5));
+    max-width: var(--wide-width);
+    padding-inline: var(--space-1);
+  }
+
+  .pile {
+    width: 30%;
+    max-width: 15rem;
+    height: 72%;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pile:disabled {
+    cursor: default;
+  }
+
+  @media (min-width: 40rem) {
+    .leaf-bed {
+      height: 12rem;
+      margin-top: var(--space-4);
+    }
+  }
+</style>

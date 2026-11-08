@@ -3,6 +3,7 @@ import "../styles/tokens.css";
 import "../styles/global.css";
 import Nav from "../components/Nav.astro";
 import Footer from "../components/Footer.astro";
+import CandleGlow from "../components/CandleGlow.astro";
 import { site } from "../content/site";
 import { coupleNames, href } from "../lib/helpers";
 import natiqueUrl from "../assets/fonts/natiques-regular.woff2?url";
@@ -29,11 +30,13 @@ const fullTitle = title ? `${title} · ${coupleNames}` : coupleNames;
     <link rel="preload" href={serifUrl} as="font" type="font/woff2" crossorigin />
   </head>
   <body>
+    <slot name="before" />
     <a class="skip-link" href="#main">{site.meta.skipToContent}</a>
     <Nav />
     <main id="main">
       <slot />
     </main>
     <Footer />
+    <CandleGlow />
   </body>
 </html>

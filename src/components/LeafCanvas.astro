@@ -1,0 +1,17 @@
+---
+/* Full-screen leaf canvas. Placed at body level (slot="before") so it sits
+   behind all page content: leaves never cover text or buttons. */
+---
+
+<canvas class="leaf-canvas" aria-hidden="true"></canvas>
+
+<style>
+  .leaf-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+</style>

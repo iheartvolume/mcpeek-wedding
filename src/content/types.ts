@@ -60,6 +60,8 @@ export interface SiteContent {
   reception: Place;
   contactEmail: string;
   announcement: string;
+  intro: { sealImage: string; openLabel: string; openHint: string; skipLabel: string };
+  leaves: { pileLabel: string; spriteImages: string[] };
   nav: Link[];
   home: {
     eyebrow: string;

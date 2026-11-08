@@ -1,0 +1,295 @@
+---
+/* Opening animation: wax seal → crack → names and date → reveal the home page.
+   Plays once per browser session. Skipped entirely with reduced motion. */
+import { site } from "../content/site";
+import { formatLongDate, href } from "../lib/helpers";
+
+const { intro, couple, weddingDate } = site;
+const seal = href(intro.sealImage);
+---
+
+<!-- Decide before first paint whether to play, so the page never flashes. -->
+<script is:inline>
+  (function () {
+    var d = document.documentElement;
+    var seen = false;
+    try {
+      seen = sessionStorage.getItem("kp-intro-seen") === "1";
+    } catch (e) {}
+    var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (seen || reduced) return;
+    d.classList.add("intro-play");
+    // Failsafe: if the intro script never loads, show the page anyway.
+    setTimeout(function () {
+      if (!d.dataset.introReady) d.classList.remove("intro-play");
+    }, 5000);
+  })();
+</script>
+
+<div class="intro" role="dialog" aria-modal="true" aria-label={intro.openLabel} data-intro>
+  <button type="button" class="skip label" data-skip>{intro.skipLabel}</button>
+
+  <div class="stage">
+    <button type="button" class="seal" data-seal aria-label={intro.openLabel}>
+      <span class="glow" aria-hidden="true"></span>
+      <img class="half left" src={seal} alt="" width="240" height="240" />
+      <img class="half right" src={seal} alt="" width="240" height="240" />
+    </button>
+    <p class="hint label" aria-hidden="true"><span>{intro.openHint}</span></p>
+
+    <div class="names" aria-hidden="true">
+      <p class="script couple">
+        {couple.first} <span class="joiner">{couple.joiner}</span> {couple.second}
+      </p>
+      <p class="label date">{formatLongDate(weddingDate)}</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  const AUTO_OPEN_MS = 2600;
+  const HOLD_MS = 3600;
+  const FADE_MS = 900;
+
+  const root = document.documentElement;
+  const intro = document.querySelector<HTMLElement>("[data-intro]");
+  const seal = intro?.querySelector<HTMLButtonElement>("[data-seal]");
+  const skip = intro?.querySelector<HTMLButtonElement>("[data-skip]");
+  const page = Array.from(document.querySelectorAll<HTMLElement>(".site-header, main, .site-footer"));
+
+  function markSeen() {
+    try {
+      sessionStorage.setItem("kp-intro-seen", "1");
+    } catch {
+      /* storage blocked: the intro may play again, which is fine */
+    }
+  }
+
+  if (intro && seal && skip) {
+    if (!root.classList.contains("intro-play")) {
+      intro.remove();
+    } else {
+      root.dataset.introReady = "1";
+      page.forEach((el) => (el.inert = true));
+
+      let opened = false;
+      let revealed = false;
+      const autoTimer = window.setTimeout(open, AUTO_OPEN_MS);
+
+      function open() {
+        if (opened) return;
+        opened = true;
+        clearTimeout(autoTimer);
+        intro!.classList.add("is-open");
+        root.dataset.introOpened = "1";
+        document.dispatchEvent(new CustomEvent("kp:intro-open"));
+        window.setTimeout(reveal, HOLD_MS);
+      }
+
+      function reveal() {
+        if (revealed) return;
+        revealed = true;
+        markSeen();
+        if (!opened) {
+          opened = true;
+          clearTimeout(autoTimer);
+          root.dataset.introOpened = "1";
+          document.dispatchEvent(new CustomEvent("kp:intro-open"));
+        }
+        intro!.classList.add("is-leaving");
+        root.classList.remove("intro-play");
+        page.forEach((el) => (el.inert = false));
+        window.setTimeout(() => intro!.remove(), FADE_MS);
+      }
+
+      seal.addEventListener("click", open);
+      skip.addEventListener("click", reveal);
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") reveal();
+      });
+    }
+  }
+</script>
+
+<style>
+  .intro {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    place-items: center;
+    padding: var(--space-3) var(--space-2);
+    color: var(--text-on-page);
+    text-align: center;
+    transition: opacity var(--duration-slow) var(--ease-soft);
+  }
+
+  :global(html.intro-play) .intro,
+  .intro.is-leaving {
+    display: grid;
+  }
+
+  .intro.is-leaving {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Hide the page underneath while the intro plays (layout stays in place). */
+  :global(.site-header),
+  :global(main),
+  :global(.site-footer) {
+    transition: opacity var(--duration-slow) var(--ease-soft);
+  }
+
+  :global(html.intro-play .site-header),
+  :global(html.intro-play main),
+  :global(html.intro-play .site-footer) {
+    opacity: 0;
+  }
+
+  :global(html.intro-play body) {
+    overflow: hidden;
+  }
+
+  .skip {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    min-height: 48px;
+    min-width: 48px;
+    padding: 0 var(--space-2);
+    background: none;
+    border: 1px solid transparent;
+    color: var(--text-on-page);
+    cursor: pointer;
+  }
+
+  .skip:hover {
+    border-color: var(--accent);
+  }
+
+  .stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    max-width: 40rem;
+  }
+
+  .seal {
+    position: relative;
+    grid-area: 1 / 1;
+    width: min(56vw, 15rem);
+    aspect-ratio: 1;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .glow {
+    position: absolute;
+    inset: -30%;
+    transition: opacity var(--duration-slow) var(--ease-soft);
+  }
+
+  .glow::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle closest-side, var(--glow-color), transparent);
+    animation: breathe 3.2s var(--ease-soft) infinite alternate;
+  }
+
+  .half {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transition:
+      transform 1100ms var(--ease-soft),
+      opacity 900ms var(--ease-soft) 250ms;
+  }
+
+  /* A jagged crack down the middle of the seal. */
+  .half.left {
+    clip-path: polygon(0 0, 52% 0, 46% 21%, 55% 40%, 47% 59%, 54% 78%, 49% 100%, 0 100%);
+  }
+
+  .half.right {
+    clip-path: polygon(52% 0, 100% 0, 100% 100%, 49% 100%, 54% 78%, 47% 59%, 55% 40%, 46% 21%);
+  }
+
+  .hint {
+    grid-area: 2 / 1;
+    margin-top: var(--space-3);
+    transition: opacity var(--duration-soft);
+  }
+
+  .hint span {
+    opacity: 0;
+    animation: fade-in 1s var(--ease-soft) 0.9s forwards;
+  }
+
+  .names {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 1200ms var(--ease-soft) 500ms,
+      transform 1200ms var(--ease-soft) 500ms;
+    pointer-events: none;
+  }
+
+  .couple {
+    font-size: var(--heading-xl);
+    line-height: 1.1;
+    margin-bottom: var(--space-2);
+  }
+
+  .joiner {
+    font-size: 0.6em;
+  }
+
+  /* --- Opened state --- */
+  .is-open .half.left {
+    transform: translate(-34px, 10px) rotate(-10deg);
+    opacity: 0;
+  }
+
+  .is-open .half.right {
+    transform: translate(34px, 14px) rotate(9deg);
+    opacity: 0;
+  }
+
+  .is-open .glow,
+  .is-open .hint {
+    opacity: 0;
+  }
+
+  .is-open .seal {
+    pointer-events: none;
+  }
+
+  .is-open .names {
+    opacity: 1;
+    transform: none;
+  }
+
+  @keyframes breathe {
+    from {
+      opacity: 0.55;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-in {
+    to {
+      opacity: 1;
+    }
+  }
+</style>

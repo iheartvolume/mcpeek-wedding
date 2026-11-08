@@ -1,5 +1,9 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Intro from "../components/Intro.astro";
+import Announcement from "../components/Announcement.astro";
+import LeafBed from "../components/LeafBed.astro";
+import LeafCanvas from "../components/LeafCanvas.astro";
 import { site } from "../content/site";
 import { daysUntil, formatLongDate, href } from "../lib/helpers";
 
@@ -8,6 +12,9 @@ const buildDays = daysUntil(weddingDate);
 ---
 
 <BaseLayout>
+  <Intro slot="before" />
+  <LeafCanvas slot="before" />
+  <Announcement />
   <div class="container">
     <section class="card card-center hero" aria-labelledby="hero-names">
       <p class="label eyebrow">{home.eyebrow}</p>
@@ -43,6 +50,7 @@ const buildDays = daysUntil(weddingDate);
       </div>
     </section>
   </div>
+  <LeafBed />
 </BaseLayout>
 
 <script>

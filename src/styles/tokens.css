@@ -71,6 +71,10 @@
   --accent: var(--color-gold);
   --focus-ring: var(--color-gold);
   --focus-ring-on-card: var(--color-text-on-peach);
+  --glow-color: color-mix(in srgb, var(--color-gold) 15%, transparent); /* candle cursor */
+  --leaf-shadow: var(--color-maroon-deep);   /* soft shadow under leaf piles */
+  --leaf-vein: var(--color-maroon-deep);     /* vein lines on drawn leaves */
+  --leaf-highlight: var(--color-cream);      /* soft sheen on drawn leaves */
 
   /* --- Font families --------------------------------------------------- */
   --font-script: "Natiques", "Libre Baskerville", Georgia, serif;
@@ -97,4 +101,5 @@
   /* --- Motion ---------------------------------------------------------- */
   --ease-soft: cubic-bezier(0.25, 0.1, 0.25, 1);
   --duration-soft: 400ms;
+  --duration-slow: 900ms;
 }
