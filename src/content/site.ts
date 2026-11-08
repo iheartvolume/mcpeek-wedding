@@ -49,8 +49,8 @@ export const site: SiteContent = {
 
   /* --- Opening animation (first visit per browser session) ------------ */
   intro: {
-    // Swap this file for the real seal (transparent PNG or SVG) and update the path.
-    sealImage: "/images/seal.svg",
+    // The wax seal image (transparent PNG, WebP, or SVG) in /public/images.
+    sealImage: "/images/seal.webp",
     openLabel: "Open the invitation",
     openHint: "Tap to open",
     skipLabel: "Skip",
