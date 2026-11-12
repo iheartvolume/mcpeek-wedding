@@ -24,7 +24,7 @@ Open the address it prints (http://localhost:4321/mcpeek-wedding/ until the cust
 |---|---|
 | Any words, dates, events, hotels, FAQs, links, email | `src/content/site.ts` |
 | Colors and fonts | `src/styles/tokens.css` |
-| Photos | put files in `public/images/` and reference them in `site.ts` as `/images/name.jpg` |
+| Our Story photos | put files in `src/assets/photos/` and type the file name in `site.ts`, e.g. `photo: "how-we-met.jpg"` (resized automatically) |
 
 Anything in `[square brackets]` is a placeholder.
 
@@ -41,7 +41,8 @@ src/pages/              one file per page
 src/components/         nav, footer, page title
 src/layouts/            the shared page shell
 src/assets/fonts/       self-hosted font files
-public/                 files served as-is (favicon, images)
+src/assets/photos/      Our Story and gallery photos
+public/                 files served as-is (favicon, seal image)
 ```
 
 ## Publishing

@@ -17,7 +17,7 @@ export interface Milestone {
   when: string;
   title: string;
   text: string;
-  /** Path to a photo in /public/images, e.g. "/images/story-1.jpg". "" shows a frame. */
+  /** File name of a photo in src/assets/photos, e.g. "how-we-met.jpg". "" shows an empty frame. */
   photo: string;
   photoAlt: string;
 }
@@ -71,7 +71,13 @@ export interface SiteContent {
     countdownPast: string;
     links: Link[];
   };
-  story: { title: string; intro: string; milestones: Milestone[] };
+  story: {
+    title: string;
+    intro: string;
+    milestones: Milestone[];
+    galleryTitle: string;
+    gallery: { photo: string; alt: string }[];
+  };
   schedule: { title: string; intro: string; events: ScheduleEvent[] };
   travel: {
     title: string;

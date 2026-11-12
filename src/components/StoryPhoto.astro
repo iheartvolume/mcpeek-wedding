@@ -1,0 +1,67 @@
+---
+/* A photo from src/assets/photos, resized and lazy-loaded, in a print-style
+   frame. Shows an empty labeled frame when no photo is set yet. */
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  photo: string;
+  alt: string;
+  sizes: string;
+  ratio?: string;
+}
+
+const { photo, alt, sizes, ratio = "4 / 3" } = Astro.props;
+
+const files = import.meta.glob<{ default: ImageMetadata }>("../assets/photos/*.{jpg,jpeg,png,webp,avif}", {
+  eager: true,
+});
+const match = photo
+  ? Object.entries(files).find(([path]) => path.split("/").pop()?.toLowerCase() === photo.toLowerCase())
+  : undefined;
+
+if (photo && !match) {
+  console.warn(`[Our Story] Photo "${photo}" was not found in src/assets/photos.`);
+}
+---
+
+<figure class="photo" style={`--ratio: ${ratio}`}>
+  {
+    match ? (
+      <Image
+        src={match[1].default}
+        alt={alt}
+        widths={[400, 700, 1000, 1400]}
+        sizes={sizes}
+        format="webp"
+        quality={78}
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <div class="frame-placeholder empty">{photo ? `[Photo not found: ${photo}]` : alt}</div>
+    )
+  }
+</figure>
+
+<style>
+  .photo {
+    margin: 0;
+    padding: 6px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-card);
+  }
+
+  .photo :global(img),
+  .empty {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--ratio);
+    object-fit: cover;
+  }
+
+  .empty {
+    font-size: var(--text-sm);
+  }
+</style>

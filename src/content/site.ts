@@ -90,6 +90,9 @@ export const site: SiteContent = {
   },
 
   /* --- Our Story ------------------------------------------------------- */
+  // Photos: put image files in src/assets/photos/ and type just the file
+  // name below, e.g. photo: "how-we-met.jpg". They are resized and
+  // compressed automatically. Leave "" to show an empty frame.
   story: {
     title: "Our Story",
     intro: "[A sentence or two introducing your story.]",
@@ -122,6 +125,17 @@ export const site: SiteContent = {
         photo: "",
         photoAlt: "[Describe the photo]",
       },
+    ],
+
+    // A photo gallery shown below the timeline. Add or remove entries freely.
+    galleryTitle: "Moments",
+    gallery: [
+      { photo: "", alt: "[Describe the photo]" },
+      { photo: "", alt: "[Describe the photo]" },
+      { photo: "", alt: "[Describe the photo]" },
+      { photo: "", alt: "[Describe the photo]" },
+      { photo: "", alt: "[Describe the photo]" },
+      { photo: "", alt: "[Describe the photo]" },
     ],
   },
 
