@@ -1,47 +1,51 @@
 ---
-/* A photo from src/assets/photos, resized and lazy-loaded, in a print-style
-   frame. Shows an empty labeled frame when no photo is set yet. */
+/* A photo from src/assets/photos (any subfolder), resized and lazy-loaded,
+   in a print-style frame with an optional caption. Keeps the photo's own
+   shape (no cropping). Shows a labeled empty frame if the file isn't there. */
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
+import type { Photo } from "../content/types";
 
 interface Props {
-  photo: string;
-  alt: string;
+  photo: Photo;
   sizes: string;
-  ratio?: string;
+  eager?: boolean;
 }
 
-const { photo, alt, sizes, ratio = "4 / 3" } = Astro.props;
+const { photo, sizes, eager = false } = Astro.props;
 
-const files = import.meta.glob<{ default: ImageMetadata }>("../assets/photos/*.{jpg,jpeg,png,webp,avif}", {
-  eager: true,
-});
-const match = photo
-  ? Object.entries(files).find(([path]) => path.split("/").pop()?.toLowerCase() === photo.toLowerCase())
+const files = import.meta.glob<{ default: ImageMetadata }>(
+  "../assets/photos/**/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP}",
+  { eager: true },
+);
+const wanted = photo.file.split("/").pop()?.toLowerCase() ?? "";
+const match = wanted
+  ? Object.entries(files).find(([path]) => path.split("/").pop()?.toLowerCase() === wanted)
   : undefined;
 
-if (photo && !match) {
-  console.warn(`[Our Story] Photo "${photo}" was not found in src/assets/photos.`);
+if (wanted && !match) {
+  console.warn(`[Our Story] Photo "${photo.file}" is not in src/assets/photos yet.`);
 }
 ---
 
-<figure class="photo" style={`--ratio: ${ratio}`}>
+<figure class="photo">
   {
     match ? (
       <Image
         src={match[1].default}
-        alt={alt}
-        widths={[400, 700, 1000, 1400]}
+        alt={photo.alt}
+        widths={[480, 800, 1200, 1600].filter((w) => w <= match[1].default.width)}
         sizes={sizes}
         format="webp"
         quality={78}
-        loading="lazy"
+        loading={eager ? "eager" : "lazy"}
         decoding="async"
       />
     ) : (
-      <div class="frame-placeholder empty">{photo ? `[Photo not found: ${photo}]` : alt}</div>
+      <div class="frame-placeholder empty">[Photo: {photo.file || photo.alt}]</div>
     )
   }
+  {photo.caption && <figcaption>{photo.caption}</figcaption>}
 </figure>
 
 <style>
@@ -50,18 +54,26 @@ if (photo && !match) {
     padding: 6px;
     background: var(--surface-card);
     border: 1px solid var(--border-card);
+    break-inside: avoid;
   }
 
-  .photo :global(img),
-  .empty {
+  .photo :global(img) {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: var(--ratio);
-    object-fit: cover;
   }
 
   .empty {
+    aspect-ratio: 4 / 3;
     font-size: var(--text-sm);
+    word-break: break-word;
+  }
+
+  figcaption {
+    padding: var(--space-1) var(--space-1) 0.15rem;
+    font-size: var(--text-sm);
+    font-style: italic;
+    text-align: center;
+    color: var(--text-on-card);
   }
 </style>

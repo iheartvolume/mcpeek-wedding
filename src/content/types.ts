@@ -13,13 +13,21 @@ export interface Place {
   mapsUrl: string;
 }
 
+export interface Photo {
+  /** File name of an image in src/assets/photos, e.g. "how-we-met.jpg". */
+  file: string;
+  /** Describes the photo for screen readers. */
+  alt: string;
+  /** Optional line shown under the photo. */
+  caption: string;
+}
+
+/** A section of Our Story: paragraphs and photo rows, in order. */
 export interface Milestone {
+  /** Shown above the title, e.g. "December 2022". "" to hide. */
   when: string;
   title: string;
-  text: string;
-  /** File name of a photo in src/assets/photos, e.g. "how-we-met.jpg". "" shows an empty frame. */
-  photo: string;
-  photoAlt: string;
+  body: (string | { photos: Photo[] })[];
 }
 
 export interface ScheduleEvent {
@@ -74,9 +82,9 @@ export interface SiteContent {
   story: {
     title: string;
     intro: string;
+    headerPhoto: Photo;
     milestones: Milestone[];
-    galleryTitle: string;
-    gallery: { photo: string; alt: string }[];
+    closingPhoto: Photo;
   };
   schedule: { title: string; intro: string; events: ScheduleEvent[] };
   travel: {

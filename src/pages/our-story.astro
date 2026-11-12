@@ -5,10 +5,12 @@ import StoryPhoto from "../components/StoryPhoto.astro";
 import { site } from "../content/site";
 
 const { story } = site;
+const cardPhotoSizes = "(min-width: 48rem) 36rem, calc(100vw - 7rem)";
+const pairPhotoSizes = "(min-width: 48rem) 18rem, calc(100vw - 7rem)";
 ---
 
 <BaseLayout title={story.title}>
-  <!-- Hide milestones before first paint so they can fade in as you scroll.
+  <!-- Hide sections before first paint so they can fade in as you scroll.
        Skipped with reduced motion; a failsafe shows everything if scripts fail. -->
   <script is:inline slot="before">
     (function () {
@@ -22,20 +24,41 @@ const { story } = site;
     })();
   </script>
 
-  <div class="container-wide">
+  <div class="container">
     <PageTitle title={story.title} intro={story.intro} />
+
+    {
+      story.headerPhoto.file && (
+        <div class="header-photo">
+          <StoryPhoto photo={story.headerPhoto} sizes="(min-width: 48rem) 44rem, calc(100vw - 2rem)" eager />
+        </div>
+      )
+    }
 
     <ol class="timeline">
       {
-        story.milestones.map((m, i) => (
-          <li class:list={["milestone", i % 2 ? "right" : "left"]} data-reveal>
+        story.milestones.map((m) => (
+          <li class="milestone" data-reveal>
             <span class="marker" aria-hidden="true" />
-            <p class="when-aside label" aria-hidden="true">{m.when}</p>
             <article class="card">
-              <p class="label when">{m.when}</p>
+              {m.when && <p class="label when">{m.when}</p>}
               <h2 class="script">{m.title}</h2>
-              <StoryPhoto photo={m.photo} alt={m.photoAlt} sizes="(min-width: 56rem) 28rem, calc(100vw - 6rem)" />
-              <p class="text">{m.text}</p>
+              <div class="divider" aria-hidden="true">
+                <span />
+              </div>
+              <div class="body">
+                {m.body.map((block) =>
+                  typeof block === "string" ? (
+                    <p>{block}</p>
+                  ) : (
+                    <div class:list={["photos", block.photos.length > 1 && "multi"]}>
+                      {block.photos.map((p) => (
+                        <StoryPhoto photo={p} sizes={block.photos.length > 1 ? pairPhotoSizes : cardPhotoSizes} />
+                      ))}
+                    </div>
+                  ),
+                )}
+              </div>
             </article>
           </li>
         ))
@@ -43,20 +66,13 @@ const { story } = site;
     </ol>
 
     {
-      story.gallery.length > 0 && (
-        <section class="gallery" aria-labelledby="gallery-title" data-reveal>
-          <h2 id="gallery-title" class="script">{story.galleryTitle}</h2>
+      story.closingPhoto.file && (
+        <div class="closing" data-reveal>
           <div class="divider" aria-hidden="true">
             <span />
           </div>
-          <ul class="grid">
-            {story.gallery.map((g) => (
-              <li>
-                <StoryPhoto photo={g.photo} alt={g.alt} ratio="1 / 1" sizes="(min-width: 56rem) 20rem, 45vw" />
-              </li>
-            ))}
-          </ul>
-        </section>
+          <StoryPhoto photo={story.closingPhoto} sizes="(min-width: 48rem) 30rem, calc(100vw - 4rem)" />
+        </div>
       )
     }
   </div>
@@ -65,7 +81,6 @@ const { story } = site;
 <script>
   const root = document.documentElement;
   root.dataset.revealReady = "1";
-  const items = document.querySelectorAll<HTMLElement>("[data-reveal]");
 
   if (root.classList.contains("story-reveal")) {
     const io = new IntersectionObserver(
@@ -77,21 +92,24 @@ const { story } = site;
           }
         }
       },
-      { rootMargin: "0px 0px -12% 0px", threshold: 0.12 },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0.05 },
     );
-    items.forEach((el) => io.observe(el));
+    document.querySelectorAll("[data-reveal]").forEach((el) => io.observe(el));
   }
 </script>
 
 <style>
-  /* --- Timeline: line on the left on phones, centered on wide screens --- */
+  .header-photo {
+    margin-bottom: var(--space-4);
+  }
+
+  /* --- Timeline: a thin gold line down the left -------------------------- */
   .timeline {
-    --line-x: 0.75rem;
+    --line-x: 0.6rem;
     position: relative;
     list-style: none;
-    margin: 0 auto;
+    margin: 0;
     padding: 0;
-    max-width: var(--content-width);
   }
 
   .timeline::before {
@@ -107,7 +125,7 @@ const { story } = site;
 
   .milestone {
     position: relative;
-    padding-left: calc(var(--line-x) + 1.75rem);
+    padding-left: calc(var(--line-x) + 1.5rem);
   }
 
   .milestone + .milestone {
@@ -118,7 +136,7 @@ const { story } = site;
   .marker {
     position: absolute;
     left: var(--line-x);
-    top: 2.4rem;
+    top: 2.6rem;
     width: 11px;
     height: 11px;
     background: var(--accent);
@@ -126,11 +144,12 @@ const { story } = site;
     box-shadow: 0 0 0 4px var(--surface-page);
   }
 
-  .when-aside {
-    display: none;
+  .milestone .card {
+    padding-inline: var(--space-2);
   }
 
-  .milestone .card {
+  .when,
+  .milestone h2 {
     text-align: center;
   }
 
@@ -138,95 +157,53 @@ const { story } = site;
     margin-bottom: var(--space-1);
   }
 
-  .milestone :global(.photo) {
-    margin: var(--space-3) 0;
+  .milestone .divider {
+    margin-top: 0;
   }
 
-  .text {
-    text-align: left;
+  .body > * + * {
+    margin-top: var(--space-3);
   }
 
-  /* --- Gallery ------------------------------------------------------- */
-  .gallery {
-    margin-top: var(--space-5);
-    text-align: center;
-  }
-
-  .gallery h2 {
+  .body p {
     margin-bottom: 0;
   }
 
-  .grid {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  .photos {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-2);
   }
 
-  /* --- Wide screens: centered line, alternating sides ------------------ */
-  @media (min-width: 56rem) {
+  /* --- Closing photo ---------------------------------------------------- */
+  .closing {
+    max-width: 30rem;
+    margin: var(--space-4) auto 0;
+  }
+
+  .closing .divider {
+    color: var(--accent);
+    margin-bottom: var(--space-4);
+  }
+
+  @media (min-width: 40rem) {
+    .milestone .card {
+      padding-inline: var(--space-4);
+    }
+
+    /* Two or more photos: two columns in reading order, each photo keeps its own shape. */
+    .photos.multi {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+  }
+
+  @media (min-width: 64rem) {
     .timeline {
-      --line-x: 50%;
-      max-width: var(--wide-width);
+      --line-x: -2.5rem;
     }
 
     .milestone {
-      width: 50%;
       padding-left: 0;
-    }
-
-    .milestone.left {
-      padding-right: 3rem;
-    }
-
-    .milestone.right {
-      margin-left: 50%;
-      padding-left: 3rem;
-    }
-
-    .milestone + .milestone {
-      margin-top: calc(-1 * var(--space-5));
-    }
-
-    .marker {
-      left: auto;
-      top: 3rem;
-    }
-
-    .milestone.left .marker {
-      right: 0;
-      transform: translate(50%, -50%) rotate(45deg);
-    }
-
-    .milestone.right .marker {
-      left: 0;
-    }
-
-    /* The year sits across the line from its card, in gold on maroon. */
-    .when-aside {
-      display: block;
-      position: absolute;
-      top: 3rem;
-      transform: translateY(-50%);
-      margin: 0;
-      color: var(--accent);
-      font-size: var(--text-base);
-      white-space: nowrap;
-    }
-
-    .milestone.left .when-aside {
-      left: calc(100% + 2rem);
-    }
-
-    .milestone.right .when-aside {
-      right: calc(100% + 2rem);
-    }
-
-    .grid {
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-3);
     }
   }
 
@@ -242,15 +219,5 @@ const { story } = site;
   :global(html.story-reveal) [data-reveal].is-visible {
     opacity: 1;
     transform: none;
-  }
-
-  @media (min-width: 56rem) {
-    :global(html.story-reveal) .milestone.left:not(.is-visible) {
-      transform: translate(-24px, 16px);
-    }
-
-    :global(html.story-reveal) .milestone.right:not(.is-visible) {
-      transform: translate(24px, 16px);
-    }
   }
 </style>
