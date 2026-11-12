@@ -1,77 +1,71 @@
 ---
-/* The pile "buttons" at the bottom of the home page. */
+/* The strip at the bottom of the home page where fallen leaves collect.
+   It's one big button: press anywhere on the pile to kick up leaves. */
 import { site } from "../content/site";
 import { href } from "../lib/helpers";
 
 const sprites = site.leaves.spriteImages.map((p) => href(p));
 ---
 
-<div class="leaf-bed" data-sprites={JSON.stringify(sprites)}>
-  {[0, 1, 2].map(() => <button type="button" class="pile" aria-label={site.leaves.pileLabel}></button>)}
-</div>
+<button type="button" class="leaf-bed" aria-label={site.leaves.pileLabel} data-sprites={JSON.stringify(sprites)}
+></button>
 
 <script>
   import { LeafField } from "../scripts/leaves";
 
   const canvas = document.querySelector<HTMLCanvasElement>(".leaf-canvas");
-  const bed = document.querySelector<HTMLElement>(".leaf-bed");
+  const bed = document.querySelector<HTMLButtonElement>(".leaf-bed");
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   if (canvas && bed) {
-    const piles = Array.from(bed.querySelectorAll<HTMLButtonElement>(".pile"));
     if (reduced) {
-      // Static piles only: nothing to press.
-      piles.forEach((p) => {
-        p.tabIndex = -1;
-        p.setAttribute("aria-hidden", "true");
-        p.disabled = true;
-      });
+      // A static pile only: nothing to press.
+      bed.disabled = true;
+      bed.tabIndex = -1;
+      bed.setAttribute("aria-hidden", "true");
     }
     const field = new LeafField({
       canvas,
-      pileElements: piles,
+      bed,
       spriteUrls: JSON.parse(bed.dataset.sprites || "[]"),
       reducedMotion: reduced,
     });
 
     field.init().then(() => {
       const root = document.documentElement;
-      // If the opening animation is playing, start the leaves when the seal opens.
+      // If the opening animation is playing, start the leaves when the envelope opens.
       if (root.classList.contains("intro-play") && !root.dataset.introOpened) {
-        document.addEventListener("kp:intro-open", () => field.beginSeason(), { once: true });
+        document.addEventListener("kp:intro-open", () => field.begin(), { once: true });
       } else {
-        field.beginSeason();
+        field.begin();
       }
     });
   }
 </script>
 
 <style>
+  /* Full-bleed strip: spans the whole screen width. */
   .leaf-bed {
+    display: block;
     position: relative;
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-end;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
     height: 10rem;
-    margin: var(--space-3) auto calc(-1 * var(--space-5));
-    max-width: var(--wide-width);
-    padding-inline: var(--space-1);
-  }
-
-  .pile {
-    width: 30%;
-    max-width: 15rem;
-    height: 72%;
+    margin-top: var(--space-3);
+    margin-bottom: calc(-1 * var(--space-5));
     padding: 0;
     background: none;
     border: 0;
-    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
   }
 
-  .pile:disabled {
+  .leaf-bed:disabled {
     cursor: default;
+  }
+
+  .leaf-bed:focus-visible {
+    outline-offset: -6px;
   }
 
   @media (min-width: 40rem) {

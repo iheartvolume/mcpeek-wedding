@@ -54,6 +54,10 @@
   --color-gold: #c9a45c;         /* muted antique gold (wax seal); use sparingly */
   --color-maroon-deep: #3d0b0b;  /* deeper maroon for vignette and glow edges */
 
+  /* --- Envelope (opening animation) — OWNER REVIEW ------------------- */
+  --color-navy: #283358;         /* envelope paper */
+  --color-navy-deep: #161d38;    /* shadows and shading on the envelope */
+
   /* --- Leaf palette (used by the falling leaves in Step 2) ------------- */
   --leaf-1: #c8642f;             /* warm orange */
   --leaf-2: #e0805e;             /* coral */
@@ -69,6 +73,9 @@
   --text-on-card: var(--color-text-on-peach);
   --text-on-page: var(--color-cream);
   --accent: var(--color-gold);
+  --surface-envelope: var(--color-navy);
+  --envelope-shadow: var(--color-navy-deep);
+  --text-on-envelope: var(--color-cream);
   --focus-ring: var(--color-gold);
   --focus-ring-on-card: var(--color-text-on-peach);
   --glow-color: color-mix(in srgb, var(--color-gold) 15%, transparent); /* candle cursor */

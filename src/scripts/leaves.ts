@@ -1,31 +1,24 @@
 /* ==========================================================================
    FALLING LEAVES — plain canvas, no libraries.
 
-   - Leaves are drawn in code (four leaf outlines with veins), or loaded from
-     optional image sprites (see site.ts → leaves.spriteImages).
-   - Leaves drift down, settle into piles, and burst upward when a pile is
-     pressed, then drift back down and resettle.
-   - The animation loop only runs while something is moving, pauses when the
-     tab is hidden, and the canvas sits BEHIND page content so leaves never
-     cover text or buttons.
+   - Leaves fall continuously and collect into ONE pile across the bottom of
+     the home page. The pile starts empty and grows as leaves land.
+   - Pressing anywhere on the pile kicks up the leaves under the pointer (a
+     clump, or a single leaf). They fly up, drift down, and stay where they land.
+   - The canvas sits BEHIND page content, so leaves never cover text or buttons.
+   - Performance: settled leaves are painted once into cached layers; only
+     moving leaves are redrawn each frame. Paused when the tab is hidden.
    ========================================================================== */
 
-type Mode = "settled" | "air" | "falling";
+import { SHAPES, cssVar, drawLeafSprite, loadImage, type Sprite } from "./leaf-sprites";
 
-interface Sprite {
-  image: CanvasImageSource;
-  aspect: number; // width / height
-}
+type Mode = "air" | "falling" | "settled";
 
 interface Leaf {
   sprite: number;
   size: number; // height in CSS px
   mode: Mode;
-  pile: number;
-  // Position relative to its pile (settled) or landing target (falling): rx in [-1, 1], ry in [0, 1].
-  rx: number;
-  ry: number;
-  // Document coordinates while moving.
+  // While moving: document coordinates
   x: number;
   y: number;
   vx: number;
@@ -35,167 +28,32 @@ interface Leaf {
   flip: number;
   flipSpeed: number;
   flatten: number; // horizontal squash when resting
-  // Falling path
-  x0: number;
-  y0: number;
-  vt: number; // terminal velocity
+  vt: number; // terminal fall speed
   swayA: number;
   swayW: number;
   swayP: number;
   t: number;
-}
-
-interface Pile {
-  el: HTMLElement;
-  cx: number;
-  gy: number; // ground line (document y)
-  hw: number; // half width
-  h: number; // mound height
-  leaves: Leaf[];
+  // While settled: position relative to the pile
+  fx: number; // x as a fraction of the pile width
+  dy: number; // y offset from the ground line (negative = above)
+  peak: number; // how much this leaf raised the pile
 }
 
 export interface LeafFieldOptions {
   canvas: HTMLCanvasElement;
-  pileElements: HTMLElement[];
+  bed: HTMLElement;
   spriteUrls: string[];
   reducedMotion: boolean;
 }
 
-const GRAVITY = 900; // px/s² for the burst
+const GRAVITY = 900; // px/s², for kicked leaves
+const BIN = 4; // px per column of the pile height map
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
-/* --- Leaf shapes --------------------------------------------------------
-   Each returns outline points; they are normalized to a 1-unit-tall box. */
-type Shape = { points: () => [number, number][]; veins: number };
-
-const SHAPES: Shape[] = [
-  // Elm: pointed oval
-  {
-    veins: 5,
-    points: () => {
-      const pts: [number, number][] = [];
-      for (let i = 0; i < 64; i++) {
-        const t = (i / 64) * Math.PI * 2;
-        const s = Math.sin(t);
-        pts.push([0.34 * Math.sign(s) * Math.pow(Math.abs(s), 1.5) * (1 - 0.2 * Math.cos(t)), -0.5 * Math.cos(t)]);
-      }
-      return pts;
-    },
-  },
-  // Maple: five pointed lobes
-  {
-    veins: 0,
-    points: () => polar(180, (phi) => (0.26 + 0.24 * Math.pow(Math.abs(Math.cos(2.5 * phi)), 3)) * (0.82 + 0.18 * Math.cos(phi)), 1),
-  },
-  // Oak: long with rounded lobes
-  {
-    veins: 4,
-    points: () => polar(160, (phi) => 0.36 + 0.06 * Math.cos(7 * phi), 0.62),
-  },
-  // Birch: broad, finely toothed
-  {
-    veins: 4,
-    points: () => polar(200, (phi) => 0.42 * (0.84 + 0.16 * Math.cos(phi)) * (1 + 0.025 * Math.cos(26 * phi)), 0.78),
-  },
-];
-
-/** Sample a polar outline; phi = 0 points up (leaf tip). */
-function polar(n: number, r: (phi: number) => number, xScale: number): [number, number][] {
-  const pts: [number, number][] = [];
-  for (let i = 0; i < n; i++) {
-    const phi = (i / n) * Math.PI * 2;
-    const rr = r(phi);
-    pts.push([Math.sin(phi) * rr * xScale, -Math.cos(phi) * rr]);
-  }
-  return pts;
-}
-
-function cssVar(name: string): string {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
-/** Render one leaf shape in one color to an offscreen canvas. */
-function drawLeafSprite(shape: Shape, color: string, vein: string, highlight: string, px: number): Sprite {
-  const raw = shape.points();
-  const xs = raw.map((p) => p[0]);
-  const ys = raw.map((p) => p[1]);
-  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-  const bodyH = 0.88; // leave room for the stem
-  const scale = bodyH / (maxY - minY);
-  const w = (maxX - minX) * scale;
-  const pts = raw.map(([x, y]) => [(x - (minX + maxX) / 2) * scale, (y - minY) * scale - 0.5] as [number, number]);
-  const aspect = Math.max(w, 0.2);
-
+function layer(): { c: HTMLCanvasElement; ctx: CanvasRenderingContext2D } {
   const c = document.createElement("canvas");
-  c.width = Math.ceil(px * aspect) + 2;
-  c.height = px + 2;
-  const ctx = c.getContext("2d")!;
-  ctx.translate(c.width / 2, c.height / 2);
-  ctx.scale(px, px);
-
-  // Body
-  ctx.beginPath();
-  pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
-  ctx.closePath();
-  ctx.fillStyle = color;
-  ctx.fill();
-
-  // Soft sheen on one side
-  ctx.save();
-  ctx.clip();
-  const g = ctx.createLinearGradient(-w / 2, -0.5, w / 2, 0.5);
-  g.addColorStop(0, highlight);
-  g.addColorStop(0.6, "transparent");
-  ctx.globalAlpha = 0.18;
-  ctx.fillStyle = g;
-  ctx.fillRect(-w, -1, w * 2, 2);
-  ctx.restore();
-
-  // Veins and stem
-  ctx.strokeStyle = vein;
-  ctx.lineCap = "round";
-  ctx.globalAlpha = 0.35;
-  ctx.lineWidth = 0.022;
-  const top = -0.5, base = bodyH - 0.5;
-  ctx.beginPath();
-  ctx.moveTo(0, top + 0.06);
-  ctx.lineTo(0, 0.5);
-  if (shape.veins === 0) {
-    // Palmate veins for the maple
-    for (const a of [-1.25, -0.6, 0.6, 1.25]) {
-      ctx.moveTo(0, base - 0.18);
-      ctx.lineTo(Math.sin(a) * 0.36 * (w / 1), base - 0.18 - Math.cos(a) * 0.36);
-    }
-  } else {
-    for (let i = 1; i <= shape.veins; i++) {
-      const y = top + (bodyH * i) / (shape.veins + 1);
-      const reach = (w / 2) * 0.62;
-      ctx.moveTo(0, y + 0.06);
-      ctx.lineTo(-reach, y - 0.05);
-      ctx.moveTo(0, y + 0.06);
-      ctx.lineTo(reach, y - 0.05);
-    }
-  }
-  ctx.stroke();
-  ctx.globalAlpha = 0.6;
-  ctx.lineWidth = 0.03;
-  ctx.beginPath();
-  ctx.moveTo(0, base - 0.02);
-  ctx.lineTo(0, 0.5);
-  ctx.stroke();
-
-  return { image: c, aspect: c.width / c.height };
-}
-
-function loadImage(url: string): Promise<Sprite | null> {
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.decoding = "async";
-    img.onload = () => resolve({ image: img, aspect: img.naturalWidth / img.naturalHeight || 1 });
-    img.onerror = () => resolve(null);
-    img.src = url;
-  });
+  return { c, ctx: c.getContext("2d")! };
 }
 
 export class LeafField {
@@ -205,60 +63,62 @@ export class LeafField {
   private vw = 0;
   private vh = 0;
   private sprites: Sprite[] = [];
-  private piles: Pile[] = [];
+
+  // Pile geometry (document coordinates)
+  private left = 0;
+  private width = 0;
+  private ground = 0;
+  private maxH = 0;
+  private cacheTop = 0;
+  private heights = new Float32Array(0);
+
+  private live: Leaf[] = []; // settled, can be kicked
+  private baked: Leaf[] = []; // settled and buried: kept only as pixels
   private moving: Leaf[] = [];
-  private reduced: boolean;
+  private bakedLayer = layer();
+  private liveLayer = layer();
+
   private small = false;
-  private perPile = 30;
-  private seasonLeft = 0;
+  private maxLive = 300;
+  private maxBaked = 1200;
+  private maxFalling = 20;
+  private falling = false;
   private spawnTimer = 0;
-  private seasonSpawned = 0;
-  private maxFalling = 12;
   private raf = 0;
   private last = 0;
   private drawQueued = false;
-  private shadowColor = "";
 
   constructor(private opts: LeafFieldOptions) {
     this.canvas = opts.canvas;
     this.ctx = this.canvas.getContext("2d")!;
-    this.reduced = opts.reducedMotion;
-    this.piles = opts.pileElements.map((el) => ({ el, cx: 0, gy: 0, hw: 0, h: 0, leaves: [] }));
   }
 
   async init(): Promise<void> {
-    this.measure();
-    this.shadowColor = cssVar("--leaf-shadow");
+    this.measure(true);
     this.sprites = await this.buildSprites();
     if (!this.sprites.length) return;
 
-    this.small = this.vw < 640;
-    this.perPile = this.small ? 30 : 44;
-    this.maxFalling = this.small ? 8 : 14;
-    for (let i = 0; i < this.piles.length; i++) {
-      for (let n = 0; n < this.perPile; n++) this.piles[i].leaves.push(this.makeSettled(i));
+    if (this.opts.reducedMotion) {
+      // A finished pile, drawn once. No falling, no kicking.
+      for (let i = 0; i < this.maxLive; i++) this.settleAt(this.newLeaf(), this.spawnX());
     }
+    this.renderLayers();
 
-    window.addEventListener("resize", () => this.measureAndDraw(), { passive: true });
+    window.addEventListener("resize", () => this.onLayoutChange(), { passive: true });
     window.addEventListener("scroll", () => this.requestDraw(), { passive: true });
-    new ResizeObserver(() => this.measureAndDraw()).observe(document.body);
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden) this.stop();
-      else this.start();
-    });
+    new ResizeObserver(() => this.onLayoutChange()).observe(document.body);
+    document.addEventListener("visibilitychange", () => (document.hidden ? this.stop() : this.start()));
 
-    if (!this.reduced) {
-      this.piles.forEach((p, i) => p.el.addEventListener("click", () => this.burst(i)));
+    if (!this.opts.reducedMotion) {
+      this.opts.bed.addEventListener("click", (e) => this.onPress(e));
     }
     this.draw();
   }
 
-  /** Start a gentle fall of new leaves onto the piles. */
-  beginSeason(): void {
-    if (this.reduced || !this.sprites.length) return;
-    this.seasonLeft = this.small ? 18 : 34;
-    this.spawnTimer = 0;
-    this.seasonSpawned = 0;
+  /** Start the never-ending leaf fall. */
+  begin(): void {
+    if (this.opts.reducedMotion || !this.sprites.length) return;
+    this.falling = true;
     this.start();
   }
 
@@ -277,117 +137,189 @@ export class LeafField {
     return out;
   }
 
-  private measure(): void {
+  private measure(first = false): boolean {
     this.dpr = Math.min(window.devicePixelRatio || 1, 2);
     this.vw = document.documentElement.clientWidth;
     this.vh = window.innerHeight;
     this.canvas.width = Math.round(this.vw * this.dpr);
     this.canvas.height = Math.round(this.vh * this.dpr);
-    for (const p of this.piles) {
-      const r = p.el.getBoundingClientRect();
-      p.cx = r.left + r.width / 2 + window.scrollX;
-      p.gy = r.bottom + window.scrollY - 6;
-      p.hw = r.width / 2;
-      p.h = r.height * 0.7;
+
+    const r = this.opts.bed.getBoundingClientRect();
+    const oldWidth = this.width;
+    const oldTop = this.cacheTop;
+    this.left = r.left + window.scrollX;
+    this.width = r.width;
+    this.ground = r.bottom + window.scrollY - 4;
+    this.maxH = r.height * 0.72;
+    this.cacheTop = this.ground - r.height - 40;
+
+    if (first) {
+      this.small = this.vw < 640;
+      this.maxLive = this.small ? 240 : 520;
+      this.maxBaked = this.small ? 900 : 2000;
+      this.maxFalling = this.small ? 28 : 64;
     }
+    const widthChanged = Math.abs(oldWidth - this.width) > 0.5;
+    if (first || widthChanged) this.rebuildHeights();
+    return widthChanged || Math.abs(oldTop - this.cacheTop) > 0.5;
   }
 
-  private measureAndDraw(): void {
-    this.measure();
+  private onLayoutChange(): void {
+    if (this.measure()) this.renderLayers();
     this.requestDraw();
   }
 
-  private pickSprite(): number {
-    return Math.floor(Math.random() * this.sprites.length);
+  /* --- Pile height map -------------------------------------------------- */
+  private binOf(x: number): number {
+    return clamp(Math.floor((x - this.left) / BIN), 0, this.heights.length - 1);
   }
 
-  private leafSize(): number {
-    return rand(16, 30) * (this.small ? 0.85 : 1);
+  private heightAt(x: number): number {
+    return this.heights.length ? this.heights[this.binOf(x)] : 0;
   }
 
-  private blankLeaf(pile: number): Leaf {
+  /** Add (sign 1) or remove (sign -1) a leaf's soft bump from the height map. */
+  private contribute(leaf: Leaf, sign: 1 | -1): void {
+    const cx = this.left + leaf.fx * this.width;
+    const half = leaf.size * 0.75;
+    const b0 = this.binOf(cx - half), b1 = this.binOf(cx + half);
+    for (let b = b0; b <= b1; b++) {
+      const d = this.left + (b + 0.5) * BIN - cx;
+      if (Math.abs(d) >= half) continue;
+      const amt = leaf.peak * 0.5 * (1 + Math.cos((Math.PI * d) / half));
+      this.heights[b] = Math.max(0, this.heights[b] + sign * amt);
+    }
+  }
+
+  private rebuildHeights(): void {
+    this.heights = new Float32Array(Math.max(1, Math.ceil(this.width / BIN)));
+    for (const l of this.baked) this.contribute(l, 1);
+    for (const l of this.live) this.contribute(l, 1);
+  }
+
+  /* --- Leaves ----------------------------------------------------------- */
+  private newLeaf(): Leaf {
     return {
-      sprite: this.pickSprite(), size: this.leafSize(), mode: "settled", pile,
-      rx: 0, ry: 0, x: 0, y: 0, vx: 0, vy: 0,
+      sprite: Math.floor(Math.random() * this.sprites.length),
+      size: rand(16, 30) * (this.small ? 0.85 : 1),
+      mode: "falling",
+      x: 0, y: 0, vx: 0, vy: 0,
       rot: rand(0, Math.PI * 2), spin: 0, flip: rand(0, Math.PI * 2), flipSpeed: rand(1, 2.4),
-      flatten: rand(0.7, 1), x0: 0, y0: 0, vt: rand(36, 70),
+      flatten: rand(0.7, 1), vt: rand(45, 90),
       swayA: rand(14, 34), swayW: rand(0.7, 1.3), swayP: rand(0, Math.PI * 2), t: 0,
+      fx: 0, dy: 0, peak: 0,
     };
   }
 
-  /** A point inside a soft mound. surface=true keeps it near the top layer. */
-  private moundPoint(surface: boolean): { rx: number; ry: number } {
-    const u = clamp(Math.random() + Math.random() - 1, -0.98, 0.98);
-    const height = Math.pow(1 - u * u, 0.85);
-    const depth = surface ? rand(0.55, 1) : Math.pow(Math.random(), 0.7);
-    return { rx: u, ry: height * depth };
+  /** Where new leaves fall: across the whole width, a little heavier in the middle. */
+  private spawnX(): number {
+    const u = Math.random() < 0.5 ? Math.random() : (Math.random() + Math.random() + Math.random()) / 3;
+    return this.left + u * this.width;
   }
 
-  private makeSettled(pile: number): Leaf {
-    const leaf = this.blankLeaf(pile);
-    Object.assign(leaf, this.moundPoint(false));
-    return leaf;
-  }
-
-  /* --- Motion ----------------------------------------------------------- */
-  private spawnFalling(): void {
-    const pi = Math.floor(Math.random() * this.piles.length);
-    const p = this.piles[pi];
-    const leaf = this.blankLeaf(pi);
-    Object.assign(leaf, this.moundPoint(true));
-    leaf.mode = "falling";
-    leaf.x0 = clamp(p.cx + rand(-1.8, 1.8) * p.hw, 10, this.vw - 10);
-    leaf.y0 = window.scrollY - rand(10, 50);
-    leaf.x = leaf.x0;
-    leaf.y = leaf.y0;
+  private spawn(): void {
+    const leaf = this.newLeaf();
+    leaf.x = this.spawnX();
+    leaf.y = window.scrollY - rand(10, 50);
     leaf.vy = leaf.vt;
     this.moving.push(leaf);
   }
 
-  private burst(pi: number): void {
-    const p = this.piles[pi];
-    for (const leaf of p.leaves) {
-      leaf.x = p.cx + leaf.rx * p.hw;
-      leaf.y = p.gy - leaf.ry * p.h;
-      leaf.mode = "air";
-      leaf.vx = leaf.rx * 140 + rand(-90, 90);
-      leaf.vy = -rand(380, 760) * (0.7 + 0.3 * leaf.ry);
-      leaf.spin = rand(-7, 7);
-      leaf.flipSpeed = rand(3, 7);
-      leaf.vt = rand(70, 120);
-      this.moving.push(leaf);
+  /** Rest a leaf on the pile surface at (or just beside) x. */
+  private settleAt(leaf: Leaf, x: number): void {
+    // Slide into the lowest spot nearby, the way real leaves tuck into dips.
+    const reach = leaf.size * 0.4;
+    let best = clamp(x, this.left + 2, this.left + this.width - 2);
+    let bestH = this.heightAt(best);
+    for (let dx = -reach; dx <= reach; dx += BIN) {
+      const h = this.heightAt(best + dx);
+      if (h < bestH - 0.5) {
+        bestH = h;
+        best = best + dx;
+      }
     }
-    p.leaves = [];
-    this.start();
-  }
+    leaf.mode = "settled";
+    leaf.fx = (best - this.left) / this.width;
+    leaf.dy = -bestH + leaf.size * 0.2;
+    const base = leaf.size * 0.42;
+    leaf.peak = base * clamp((this.maxH - bestH) / base, 0, 1);
+    this.contribute(leaf, 1);
+    this.live.push(leaf);
 
-  private toFalling(leaf: Leaf): void {
-    Object.assign(leaf, this.moundPoint(true));
-    leaf.mode = "falling";
-    leaf.x0 = leaf.x;
-    leaf.y0 = leaf.y;
-    leaf.t = 0;
-    leaf.flipSpeed = rand(1, 2.4);
+    // Keep the kickable set capped: bury the oldest leaf into the baked layer.
+    if (this.live.length > this.maxLive) {
+      const old = this.live.shift()!;
+      this.baked.push(old);
+      this.paintSettled(this.bakedLayer.ctx, old);
+      if (this.baked.length > this.maxBaked) this.baked.shift();
+    }
   }
 
   private land(leaf: Leaf): void {
-    leaf.mode = "settled";
-    const p = this.piles[leaf.pile];
-    p.leaves.push(leaf);
-    // Keep the leaf count capped: drop the oldest (bottom-most) leaf.
-    if (p.leaves.length > this.perPile + 4) p.leaves.shift();
+    this.settleAt(leaf, leaf.x);
+    this.paintSettled(this.liveLayer.ctx, leaf);
+  }
+
+  private onPress(e: MouseEvent): void {
+    // Keyboard presses (Enter/Space) arrive with detail 0: kick a random spot.
+    let px: number, py: number;
+    if (e.detail === 0) {
+      px = this.left + rand(0.15, 0.85) * this.width;
+      py = this.ground - this.heightAt(px) + 6;
+      this.kick(px, py, 60);
+    } else {
+      px = e.clientX + window.scrollX;
+      py = e.clientY + window.scrollY;
+      this.kick(px, py, this.small ? 24 : 28);
+    }
+  }
+
+  private kick(px: number, py: number, radius: number): void {
+    const pos = (l: Leaf) => [this.left + l.fx * this.width, this.ground + l.dy] as const;
+    let hits = this.live.filter((l) => {
+      const [x, y] = pos(l);
+      return Math.hypot(x - px, y - py) < radius + l.size * 0.3;
+    });
+    if (!hits.length) {
+      // Nothing right under the pointer: take the nearest leaf if it's close.
+      let best: Leaf | null = null, bestD = radius * 2.2;
+      for (const l of this.live) {
+        const [x, y] = pos(l);
+        const d = Math.hypot(x - px, y - py);
+        if (d < bestD) (bestD = d), (best = l);
+      }
+      if (!best) return;
+      hits = [best];
+    }
+
+    const set = new Set(hits);
+    this.live = this.live.filter((l) => !set.has(l));
+    for (const l of hits) {
+      this.contribute(l, -1);
+      const [x, y] = pos(l);
+      const dx = x - px, dy = y - py, d = Math.hypot(dx, dy) || 1;
+      l.x = x;
+      l.y = y;
+      l.mode = "air";
+      l.vx = (dx / d) * rand(80, 220) + rand(-50, 50);
+      l.vy = -rand(320, 640) * (0.65 + 0.35 * Math.random());
+      l.spin = rand(-7, 7);
+      l.flipSpeed = rand(3, 7);
+      l.vt = rand(70, 120);
+      this.moving.push(l);
+    }
+    this.renderLiveLayer();
+    this.start();
   }
 
   private update(dt: number): void {
-    // New leaves for the current "season"
-    if (this.seasonLeft > 0) {
+    if (this.falling) {
       this.spawnTimer -= dt;
-      const falling = this.moving.filter((l) => l.mode === "falling").length;
-      if (this.spawnTimer <= 0 && falling < this.maxFalling) {
-        this.spawnFalling();
-        this.seasonLeft--;
-        // A quick flurry first, then a slower drift.
-        this.spawnTimer = this.seasonSpawned++ < 8 ? rand(0.1, 0.3) : rand(0.4, 1.1);
+      let fallingCount = 0;
+      for (const l of this.moving) if (l.mode === "falling") fallingCount++;
+      if (this.spawnTimer <= 0 && fallingCount < this.maxFalling) {
+        this.spawn();
+        this.spawnTimer = rand(0.06, 0.22);
       }
     }
 
@@ -400,37 +332,45 @@ export class LeafField {
         leaf.y += leaf.vy * dt;
         leaf.rot += leaf.spin * dt;
         leaf.flip += leaf.flipSpeed * dt;
-        if (leaf.vy > 0 && leaf.vy >= leaf.vt * 0.85) this.toFalling(leaf);
+        this.bounceOffEdges(leaf);
+        if (leaf.vy > 0 && leaf.vy >= leaf.vt * 0.85) {
+          leaf.mode = "falling";
+          leaf.t = 0;
+          leaf.flipSpeed = rand(1, 2.4);
+        }
         still.push(leaf);
         continue;
       }
 
-      // Falling: ease toward terminal speed, sway, and glide onto the landing spot.
-      const p = this.piles[leaf.pile];
-      const tx = p.cx + leaf.rx * p.hw;
-      const ty = p.gy - leaf.ry * p.h;
+      // Falling: ease toward terminal speed with a gentle side-to-side sway.
       leaf.t += dt;
       leaf.vy += (leaf.vt - leaf.vy) * Math.min(1, 2.5 * dt);
-      leaf.y += leaf.vy * dt;
-      const span = ty - leaf.y0;
-      const prog = span > 1 ? clamp((leaf.y - leaf.y0) / span, 0, 1) : 1;
-      const ease = prog * prog * (3 - 2 * prog);
-      const ramp = Math.min(1, leaf.t / 1.2) * (1 - prog * prog);
+      leaf.vx *= Math.exp(-2 * dt);
+      const ramp = Math.min(1, leaf.t / 1.2);
       const phase = leaf.swayW * leaf.t + leaf.swayP;
-      leaf.x = leaf.x0 + (tx - leaf.x0) * ease + leaf.swayA * Math.sin(phase) * ramp;
+      leaf.x += (leaf.vx + leaf.swayA * leaf.swayW * Math.cos(phase) * ramp) * dt;
+      leaf.y += leaf.vy * dt;
       leaf.spin += (Math.cos(phase) * 0.9 * ramp - leaf.spin) * Math.min(1, 1.5 * dt);
       leaf.rot += leaf.spin * dt;
-      leaf.flip += leaf.flipSpeed * dt * (1 - prog);
-      if (prog >= 1) this.land(leaf);
+      leaf.flip += leaf.flipSpeed * dt;
+      this.bounceOffEdges(leaf);
+
+      if (leaf.y >= this.ground - this.heightAt(leaf.x) + leaf.size * 0.2) this.land(leaf);
       else still.push(leaf);
     }
     this.moving = still;
   }
 
+  private bounceOffEdges(leaf: Leaf): void {
+    const lo = this.left + 6, hi = this.left + this.width - 6;
+    if (leaf.x < lo) (leaf.x = lo), (leaf.vx = Math.abs(leaf.vx) * 0.3);
+    if (leaf.x > hi) (leaf.x = hi), (leaf.vx = -Math.abs(leaf.vx) * 0.3);
+  }
+
   /* --- Loop ------------------------------------------------------------- */
   private start(): void {
-    if (this.raf || document.hidden || this.reduced) return;
-    if (!this.moving.length && this.seasonLeft <= 0) return;
+    if (this.raf || document.hidden || this.opts.reducedMotion) return;
+    if (!this.falling && !this.moving.length) return;
     this.last = performance.now();
     this.raf = requestAnimationFrame(this.frame);
   }
@@ -445,8 +385,7 @@ export class LeafField {
     this.last = now;
     this.update(dt);
     this.draw();
-    if (this.moving.length || this.seasonLeft > 0) this.raf = requestAnimationFrame(this.frame);
-    else this.raf = 0;
+    this.raf = this.falling || this.moving.length ? requestAnimationFrame(this.frame) : 0;
   };
 
   private requestDraw(): void {
@@ -459,48 +398,70 @@ export class LeafField {
   }
 
   /* --- Drawing ---------------------------------------------------------- */
+  private sizeLayer(l: { c: HTMLCanvasElement; ctx: CanvasRenderingContext2D }): void {
+    l.c.width = Math.max(1, Math.round(this.width * this.dpr));
+    l.c.height = Math.max(1, Math.round((this.ground - this.cacheTop + 40) * this.dpr));
+    l.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    l.ctx.clearRect(0, 0, l.c.width, l.c.height);
+  }
+
+  /** Draw a settled leaf into a cached layer. */
+  private paintSettled(ctx: CanvasRenderingContext2D, leaf: Leaf): void {
+    this.drawLeaf(ctx, leaf, leaf.fx * this.width, this.ground + leaf.dy - this.cacheTop, leaf.flatten);
+  }
+
+  private renderLayers(): void {
+    const b = this.bakedLayer;
+    this.sizeLayer(b);
+    // One soft shadow along the whole ground line, so the pile reads as one.
+    const h = this.ground - this.cacheTop;
+    b.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    const top = h - this.maxH * 0.45, bottom = h + 30;
+    const g = b.ctx.createLinearGradient(0, top, 0, bottom);
+    g.addColorStop(0, "transparent");
+    g.addColorStop((h - top) / (bottom - top), cssVar("--leaf-shadow"));
+    g.addColorStop(1, "transparent");
+    b.ctx.globalAlpha = 0.7;
+    b.ctx.fillStyle = g;
+    b.ctx.fillRect(0, top, this.width, bottom - top);
+    b.ctx.globalAlpha = 1;
+    for (const l of this.baked) this.paintSettled(b.ctx, l);
+    this.renderLiveLayer();
+  }
+
+  private renderLiveLayer(): void {
+    this.sizeLayer(this.liveLayer);
+    for (const l of this.live) this.paintSettled(this.liveLayer.ctx, l);
+  }
+
   private draw(): void {
     const { ctx, dpr } = this;
-    const sy = window.scrollY;
-    const sx = window.scrollX;
+    const sx = window.scrollX, sy = window.scrollY;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    for (const p of this.piles) {
-      const y = p.gy - sy;
-      if (y < -p.h * 2 || y - p.h * 2 > this.vh) continue;
-      // Soft shadow under the pile
-      ctx.setTransform(dpr * p.hw * 1.15, 0, 0, dpr * p.h * 0.22, dpr * (p.cx - sx), dpr * y);
-      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
-      g.addColorStop(0, this.shadowColor);
-      g.addColorStop(1, "transparent");
-      ctx.globalAlpha = 0.7;
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(0, 0, 1, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-      for (const leaf of p.leaves) {
-        this.drawLeaf(leaf, p.cx + leaf.rx * p.hw - sx, p.gy - leaf.ry * p.h - sy, leaf.flatten);
-      }
+    const top = this.cacheTop - sy;
+    if (top < this.vh && top + this.bakedLayer.c.height / dpr > 0) {
+      const x = Math.round((this.left - sx) * dpr), y = Math.round(top * dpr);
+      ctx.drawImage(this.bakedLayer.c, x, y);
+      ctx.drawImage(this.liveLayer.c, x, y);
     }
 
     for (const leaf of this.moving) {
-      const x = leaf.x - sx;
       const y = leaf.y - sy;
       if (y < -40 || y > this.vh + 40) continue;
-      const flip = leaf.mode === "air" ? 0.25 + 0.75 * Math.abs(Math.cos(leaf.flip)) : 0.35 + 0.65 * Math.abs(Math.cos(leaf.flip));
-      this.drawLeaf(leaf, x, y, flip);
+      const flip = (leaf.mode === "air" ? 0.25 : 0.35) + 0.65 * Math.abs(Math.cos(leaf.flip));
+      this.drawLeaf(ctx, leaf, leaf.x - sx, y, flip);
     }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
 
-  private drawLeaf(leaf: Leaf, x: number, y: number, scaleX: number): void {
+  private drawLeaf(ctx: CanvasRenderingContext2D, leaf: Leaf, x: number, y: number, scaleX: number): void {
     const s = this.sprites[leaf.sprite];
     const h = leaf.size;
     const w = h * s.aspect;
     const c = Math.cos(leaf.rot), sn = Math.sin(leaf.rot), d = this.dpr;
-    this.ctx.setTransform(d * c * scaleX, d * sn * scaleX, -d * sn, d * c, d * x, d * y);
-    this.ctx.drawImage(s.image, -w / 2, -h / 2, w, h);
+    ctx.setTransform(d * c * scaleX, d * sn * scaleX, -d * sn, d * c, d * x, d * y);
+    ctx.drawImage(s.image, -w / 2, -h / 2, w, h);
   }
 }
