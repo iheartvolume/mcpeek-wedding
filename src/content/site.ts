@@ -142,6 +142,7 @@ export const site: SiteContent = {
               { file: "03-travel-haarlem-netherlands.jpg", alt: "Katie and Philip in sunglasses beside a canal in Haarlem, with tall brick canal houses behind them", caption: "Haarlem, Netherlands" },
               { file: "04-travel-love-lane-dublin.jpg", alt: "Katie and Philip in front of a colorful tiled wall of hearts and love quotes on Love Lane in Dublin", caption: "Love Lane, Dublin" },
               { file: "05-travel-audubon-aquarium-new-orleans.jpg", alt: "Katie and Philip in front of the huge blue Gulf of Mexico tank at the Audubon Aquarium", caption: "Audubon Aquarium, New Orleans" },
+              { file: "05a-travel-las-vegas.jpg", alt: "Katie and Philip taking a selfie under the retro Las Vegas sign at Harry Reid International Airport", caption: "Las Vegas" },
             ],
           },
           "Closer to home, we love the Morton Arboretum. We’ve watched the leaves turn there in the fall, and we go back after dark for Illumination, which has become one of our favorite holiday traditions.",
@@ -178,10 +179,19 @@ export const site: SiteContent = {
         ],
       },
     ],
-    closingPhoto: {
-      file: "11-closing-nose-to-nose.jpg",
-      alt: "Katie and Philip nose to nose under green trees",
-      caption: "",
+    // The last stop on the timeline: the wedding day. Its date comes from
+    // weddingDate at the top of this file. The photo sits under the text.
+    finale: {
+      title: "The Next Chapter",
+      body: [
+        "We’ll say “I do” at Trinity Lutheran Church, surrounded by the people we love most.",
+        "We can’t wait to celebrate the next chapter of our story with you.",
+      ],
+      photo: {
+        file: "11-closing-nose-to-nose.jpg",
+        alt: "Katie and Philip nose to nose under green trees",
+        caption: "",
+      },
     },
   },
 

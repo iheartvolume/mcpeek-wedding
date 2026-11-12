@@ -84,7 +84,7 @@ export interface SiteContent {
     intro: string;
     headerPhoto: Photo;
     milestones: Milestone[];
-    closingPhoto: Photo;
+    finale: { title: string; body: string[]; photo: Photo };
   };
   schedule: { title: string; intro: string; events: ScheduleEvent[] };
   travel: {

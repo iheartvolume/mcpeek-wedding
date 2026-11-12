@@ -3,6 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import PageTitle from "../components/PageTitle.astro";
 import StoryPhoto from "../components/StoryPhoto.astro";
 import { site } from "../content/site";
+import { formatDate } from "../lib/helpers";
 
 const { story } = site;
 const cardPhotoSizes = "(min-width: 32rem) 26rem, calc(100vw - 7rem)";
@@ -63,18 +64,29 @@ const pairPhotoSizes = "(min-width: 48rem) 18rem, calc(100vw - 7rem)";
           </li>
         ))
       }
-    </ol>
 
-    {
-      story.closingPhoto.file && (
-        <div class="closing" data-reveal>
+      <li class="milestone finale" data-reveal>
+        <span class="marker" aria-hidden="true" />
+        <article class="card">
+          <p class="label when">{formatDate(site.weddingDate)}</p>
+          <h2 class="script">{story.finale.title}</h2>
           <div class="divider" aria-hidden="true">
             <span />
           </div>
-          <StoryPhoto photo={story.closingPhoto} sizes="(min-width: 48rem) 30rem, calc(100vw - 4rem)" />
-        </div>
-      )
-    }
+          <div class="body">
+            {story.finale.body.map((p) => <p>{p}</p>)}
+            {
+              story.finale.photo.file && (
+                <div class="photos">
+                  <StoryPhoto photo={story.finale.photo} sizes={cardPhotoSizes} />
+                </div>
+              )
+            }
+          </div>
+        </article>
+      </li>
+    </ol>
+
   </div>
 </BaseLayout>
 
@@ -181,15 +193,18 @@ const pairPhotoSizes = "(min-width: 48rem) 18rem, calc(100vw - 7rem)";
     margin-inline: auto;
   }
 
-  /* --- Closing photo ---------------------------------------------------- */
-  .closing {
-    max-width: 30rem;
-    margin: var(--space-4) auto 0;
+  /* --- The wedding: last stop on the timeline ------------------------ */
+  .finale .body p {
+    text-align: center;
+    font-style: italic;
   }
 
-  .closing .divider {
-    color: var(--accent);
-    margin-bottom: var(--space-4);
+  .finale .marker {
+    width: 15px;
+    height: 15px;
+    box-shadow:
+      0 0 0 4px var(--surface-page),
+      0 0 14px 4px var(--glow-color);
   }
 
   @media (min-width: 40rem) {
