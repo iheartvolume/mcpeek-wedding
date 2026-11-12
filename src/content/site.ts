@@ -166,7 +166,7 @@ export const site: SiteContent = {
         ],
       },
       {
-        when: "",
+        when: "September 2026",
         title: "The Proposal",
         body: [
           "We both knew it was coming. Katie had picked out the ring, so there were no surprises there, and Phil kept the location to himself. He chose a forest preserve neither of us had ever been to, for one reason: it would look beautiful at sunset. Once we got there, it was pretty clear what was about to happen. We walked a little way, found a scenic spot, and Phil got down on one knee. Katie said yes. It was low-key and happy, just like us.",
