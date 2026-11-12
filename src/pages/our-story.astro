@@ -5,7 +5,7 @@ import StoryPhoto from "../components/StoryPhoto.astro";
 import { site } from "../content/site";
 
 const { story } = site;
-const cardPhotoSizes = "(min-width: 48rem) 36rem, calc(100vw - 7rem)";
+const cardPhotoSizes = "(min-width: 32rem) 26rem, calc(100vw - 7rem)";
 const pairPhotoSizes = "(min-width: 48rem) 18rem, calc(100vw - 7rem)";
 ---
 
@@ -30,7 +30,7 @@ const pairPhotoSizes = "(min-width: 48rem) 18rem, calc(100vw - 7rem)";
     {
       story.headerPhoto.file && (
         <div class="header-photo">
-          <StoryPhoto photo={story.headerPhoto} sizes="(min-width: 48rem) 44rem, calc(100vw - 2rem)" eager />
+          <StoryPhoto photo={story.headerPhoto} sizes="(min-width: 32rem) 28rem, calc(100vw - 2rem)" eager />
         </div>
       )
     }
@@ -100,7 +100,8 @@ const pairPhotoSizes = "(min-width: 48rem) 18rem, calc(100vw - 7rem)";
 
 <style>
   .header-photo {
-    margin-bottom: var(--space-4);
+    max-width: 28rem;
+    margin: 0 auto var(--space-4);
   }
 
   /* --- Timeline: a thin gold line down the left -------------------------- */
@@ -172,6 +173,12 @@ const pairPhotoSizes = "(min-width: 48rem) 18rem, calc(100vw - 7rem)";
   .photos {
     display: grid;
     gap: var(--space-2);
+  }
+
+  /* A single photo stays a comfortable size, centered. */
+  .photos:not(.multi) {
+    max-width: 26rem;
+    margin-inline: auto;
   }
 
   /* --- Closing photo ---------------------------------------------------- */

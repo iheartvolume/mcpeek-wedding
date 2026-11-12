@@ -102,7 +102,7 @@ export const site: SiteContent = {
     intro: "",
     headerPhoto: {
       file: "01-header-chicago-skyline.jpg",
-      alt: "Katie and Philip with the Chicago skyline",
+      alt: "Katie and Philip standing together on the lakefront, with the Chicago skyline glowing at sunset behind them",
       caption: "",
     },
     milestones: [
@@ -121,13 +121,13 @@ export const site: SiteContent = {
           "Our first date was at Barnes & Noble. We got coffee and hot chocolate from the cafe, wandered the shelves looking at books, and then found a spot to sit and talk. We had a lot in common, and the conversation came easily. Phil has since admitted he could tell Katie was nervous. It didn’t scare him off.",
           {
             photos: [
-              { file: "01a-first-date-barnes-and-noble.jpg", alt: "The Barnes & Noble where we had our first date", caption: "" },
+              { file: "01a-first-date-barnes-and-noble.jpg", alt: "Inside a Barnes & Noble, with café tables in front of shelves of new books", caption: "" },
             ],
           },
           "By our seventh date, we were at the United Center watching the Blackhawks beat the Vegas Golden Knights in a shootout. That was February 2023, just over a month after the bookstore, and it’s the earliest photo we have of the two of us together. (Katie is still salty about a waved-off buzzer-beater in the third period. We’ll leave it there.)",
           {
             photos: [
-              { file: "02-first-date-blackhawks-game.jpg", alt: "Katie and Philip at a Blackhawks game at the United Center", caption: "" },
+              { file: "02-first-date-blackhawks-game.jpg", alt: "Katie and Philip in Blackhawks jerseys, taking a selfie in the stands at the United Center", caption: "" },
             ],
           },
         ],
@@ -139,28 +139,28 @@ export const site: SiteContent = {
           "Katie’s job means we get to travel often, and we’re lucky to take full advantage. We’ve wandered the canals of Haarlem, found a wall of love quotes in a Dublin alley, stood in front of the Gulf of Mexico tank at the aquarium in New Orleans, and made more than one trip to Las Vegas.",
           {
             photos: [
-              { file: "03-travel-haarlem-netherlands.jpg", alt: "Katie and Philip in Haarlem, Netherlands", caption: "Haarlem, Netherlands" },
-              { file: "04-travel-love-lane-dublin.jpg", alt: "Katie and Philip at the wall of love quotes on Love Lane in Dublin", caption: "Love Lane, Dublin" },
-              { file: "05-travel-audubon-aquarium-new-orleans.jpg", alt: "Katie and Philip in front of the Gulf of Mexico tank at the Audubon Aquarium", caption: "Audubon Aquarium, New Orleans" },
+              { file: "03-travel-haarlem-netherlands.jpg", alt: "Katie and Philip in sunglasses beside a canal in Haarlem, with tall brick canal houses behind them", caption: "Haarlem, Netherlands" },
+              { file: "04-travel-love-lane-dublin.jpg", alt: "Katie and Philip in front of a colorful tiled wall of hearts and love quotes on Love Lane in Dublin", caption: "Love Lane, Dublin" },
+              { file: "05-travel-audubon-aquarium-new-orleans.jpg", alt: "Katie and Philip in front of the huge blue Gulf of Mexico tank at the Audubon Aquarium", caption: "Audubon Aquarium, New Orleans" },
             ],
           },
           "Closer to home, we love the Morton Arboretum. We’ve watched the leaves turn there in the fall, and we go back after dark for Illumination, which has become one of our favorite holiday traditions.",
           {
             photos: [
-              { file: "06-local-morton-arboretum-illumination.jpg", alt: "Katie and Philip among the lights at Illumination", caption: "Illumination at the Morton Arboretum" },
-              { file: "07-local-morton-arboretum-fall.jpg", alt: "Katie and Philip with fall leaves at the Morton Arboretum", caption: "" },
+              { file: "06-local-morton-arboretum-illumination.jpg", alt: "Katie and Philip bundled up in winter coats between two trees strung with colorful lights at Illumination", caption: "Illumination at the Morton Arboretum" },
+              { file: "07-local-morton-arboretum-fall.jpg", alt: "Katie and Philip relaxing in orange Adirondack chairs on the lawn at the Morton Arboretum, with autumn trees behind them", caption: "" },
             ],
           },
           "But most of our local adventures involve live music. In nearly four years together, we’ve been to more than 50 concerts, pop and classical, from Ravinia to the Riviera. Blues Traveler is practically our house band. Phil sang “Run Around” at karaoke on our second date, and we’ve seen them live at least twice since.",
           {
             photos: [
-              { file: "08-concerts-blues-traveler-riviera.jpg", alt: "Katie and Philip at a Blues Traveler concert at the Riviera Theatre", caption: "The Riviera Theatre, Chicago" },
+              { file: "08-concerts-blues-traveler-riviera.jpg", alt: "Katie and Philip under the Riviera Theatre marquee announcing Blues Traveler’s 30 Years of Four tour", caption: "The Riviera Theatre, Chicago" },
             ],
           },
           "Our camera roll is mostly selfies of the two of us out doing things, and we wouldn’t change that.",
           {
             photos: [
-              { file: "09-renaissance-faire.jpg", alt: "Katie and Philip at a Renaissance faire", caption: "" },
+              { file: "09-renaissance-faire.jpg", alt: "Katie and Philip at the Renaissance faire, both wearing flowers in their hair", caption: "" },
             ],
           },
         ],
@@ -172,7 +172,7 @@ export const site: SiteContent = {
           "We both knew it was coming. Katie had picked out the ring, so there were no surprises there, and Phil kept the location to himself. He chose a forest preserve neither of us had ever been to, for one reason: it would look beautiful at sunset. Once we got there, it was pretty clear what was about to happen. We walked a little way, found a scenic spot, and Phil got down on one knee. Katie said yes. It was low-key and happy, just like us.",
           {
             photos: [
-              { file: "10-proposal-ring-sunset.jpg", alt: "Katie’s engagement ring at sunset", caption: "" },
+              { file: "10-proposal-ring-sunset.jpg", alt: "Katie and Philip cheek to cheek at sunset, with Katie’s hand and engagement ring resting on Philip’s chest", caption: "" },
             ],
           },
         ],
@@ -180,7 +180,7 @@ export const site: SiteContent = {
     ],
     closingPhoto: {
       file: "11-closing-nose-to-nose.jpg",
-      alt: "Katie and Philip nose to nose",
+      alt: "Katie and Philip nose to nose under green trees",
       caption: "",
     },
   },
