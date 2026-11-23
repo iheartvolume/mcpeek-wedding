@@ -11,7 +11,7 @@ Context for a fresh session. Items marked **⚠ Unsure** are things this project
   - Katie, the owner, is technical enough to edit the content file and the stylesheet. She is not a developer.
   - Philip ("Phil") is taking over, so see section 7.
 - **Goals:** warm, cozy, and upscale ("candlelit dinner party, not craft fair"). It should match the save the dates, with a few memorable interactive touches.
-- **Live site:** https://iheartvolume.github.io/mcpeek-wedding/. The custom domain is not connected yet; see section 7.
+- **Live site:** https://iheartvolume.github.io/mcpeek-wedding/. The custom domain, **mcpeek.wedding**, is not connected yet; see section 7.
 
 ## 2. Project structure
 
@@ -65,7 +65,7 @@ README.md, SECRETS.md    owner-facing instructions; where secrets will live
   - Pages source is set to "GitHub Actions".
   - `main` is the default branch.
   - The `github-pages` environment has a deployment-branch rule allowing `main`. The first deploys failed until this rule was added, because the rule originally named only the old default branch.
-- **⚠ Unsure:** whether the old `claude/...` branch rule is still on that environment.
+  - If a deploy ever fails with "not allowed to deploy to github-pages", check **Settings → Environments → github-pages** and make sure `main` is listed under deployment branches. Any leftover rule naming an old branch does no harm.
 
 ## 4. Decisions and why (including what was ruled out)
 
@@ -100,8 +100,7 @@ README.md, SECRETS.md    owner-facing instructions; where secrets will live
   - The first version, a transparent overlay with a vertical seal crack and the names fading in. The owner asked for the horizontal split and the envelope.
   - Rotating the flaps past 90° (tried 172°, 180°, and 100°). The 3D perspective made them leave the frame too fast, and back faces showed as light bands in Chromium.
 - **Current settings:** the flaps stop at **90°** (edge-on) and have no back faces. Perspective is 3200px on phones and 4500px from 40rem up.
-- **Layout choice:** the flaps meet at the seal in the middle of the screen, like a gatefold, rather than folding in literal thirds. The owner's request mentioned thirds; I explained the difference and offered a band-style tri-fold, and the owner didn't ask for it.
-- **⚠ Unsure:** whether the owner still wants a true tri-fold.
+- **Layout choice:** the flaps meet at the seal in the middle of the screen, like a gatefold, rather than folding in literal thirds. The owner's request mentioned thirds, but the owner has **confirmed the current version is final**. Don't revisit the tri-fold idea unless asked.
 
 **Falling leaves (`leaves.ts`, `LeafBed.astro`)**
 - **What they do now:**
@@ -210,17 +209,18 @@ README.md, SECRETS.md    owner-facing instructions; where secrets will live
 
 ## 7. Handoff notes for Phil
 
-- **Repo:** https://github.com/iheartvolume/mcpeek-wedding is public, on the GitHub account `iheartvolume`.
-  - **⚠ Unsure:** whose account that is, and whether Phil already has access. If not, the account owner adds him under **Settings → Collaborators**.
+- **Repo:** https://github.com/iheartvolume/mcpeek-wedding is public, on **Katie's GitHub account** (`iheartvolume`).
+  - For Phil to push or change settings, Katie adds his GitHub account under **Settings → Collaborators**.
 - **Making changes:** edit `src/content/site.ts` for words and `src/styles/tokens.css` for colors and fonts. Push or merge to `main` and the site rebuilds in about a minute; check the **Actions** tab.
 - **Replacing Our Story photos:** upload a file with the **same name** into `src/assets/photos/` (on GitHub: **Add file → Upload files**). That keeps the exact file name and full quality.
 - **Domain status:**
-  - The owner owns a custom domain and said they **verified it in GitHub**.
-  - The domain name was **never shared** in this project, so `domain` in `site.ts` is still `""`.
-  - **⚠ Unsure:** whether it has been entered under **Settings → Pages → Custom domain**, and which registrar holds the DNS.
-- **To connect the domain:**
-  1. Put the domain, without `https://`, in `domain:` in `src/content/site.ts`. This switches the base path from `/mcpeek-wedding` to `/`.
-  2. In GitHub, enter it under **Settings → Pages → Custom domain**, then tick **Enforce HTTPS** once it's offered.
-  3. At the registrar, add four `A` records on the apex domain: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, and `185.199.111.153`. Add a `CNAME` for `www` pointing to `iheartvolume.github.io`.
-  4. Push to `main`. Because the site deploys through Actions, no `CNAME` file is needed in the repo.
+  - The domain is **mcpeek.wedding**. Katie owns it, but it is **not set up yet**: no DNS records, nothing under Settings → Pages, and `domain` in `site.ts` is still `""`.
+  - Early on, Katie mentioned verifying a domain in GitHub. Verifying alone doesn't connect it.
+  - **Don't fill in `domain` until DNS is pointed at GitHub.** Setting it switches every link to the bare domain, which would break the github.io address in the meantime.
+  - **⚠ Unsure:** which registrar holds the domain.
+- **To connect the domain (in this order):**
+  1. At the registrar, add four `A` records on `mcpeek.wedding`: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, and `185.199.111.153`. Add a `CNAME` for `www.mcpeek.wedding` pointing to `iheartvolume.github.io`.
+  2. In GitHub, enter `mcpeek.wedding` under **Settings → Pages → Custom domain**. Tick **Enforce HTTPS** once it's offered, which can take up to a day.
+  3. Put `mcpeek.wedding` in `domain:` in `src/content/site.ts` and push to `main`. This switches the base path from `/mcpeek-wedding` to `/`.
+  - Because the site deploys through Actions, no `CNAME` file is needed in the repo.
 - **Secrets:** none exist yet. Phase 2 keys go in GitHub or Supabase secrets, never in the repo; see `SECRETS.md`.
