@@ -65,6 +65,14 @@
   --leaf-4: #8e2a1c;             /* deep red */
   --leaf-5: #a8482a;             /* rust */
 
+  /* --- Attire color swatches (Schedule) — OWNER REVIEW ---------------- */
+  --swatch-mustard: #c99a2e;
+  --swatch-rust: #a44a2a;
+  --swatch-burgundy: #6e1a2b;
+  --swatch-plum: #6b2d5c;
+  --swatch-navy: var(--color-navy);
+  --swatch-forest: #2f4a32;
+
   /* --- Semantic aliases: what components actually use ------------------ */
   --surface-page: var(--color-maroon);
   --surface-page-edge: var(--color-maroon-deep);

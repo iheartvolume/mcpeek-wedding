@@ -45,6 +45,8 @@ export interface ScheduleEvent {
   address: string;
   description: string;
   dressCode: string;
+  /** Optional color bar under the attire text; color names a --swatch-… token. */
+  swatches?: { label: string; color: string }[];
 }
 
 export interface Hotel {
@@ -91,7 +93,7 @@ export interface SiteContent {
   schedule: {
     title: string;
     intro: string;
-    labels: { now: string; next: string; where: string; attire: string };
+    labels: { now: string; next: string; where: string; attire: string; swatches: string };
     events: ScheduleEvent[];
   };
   travel: {

@@ -41,7 +41,20 @@ const { schedule } = site;
               {e.dressCode && (
                 <div>
                   <dt class="label">{schedule.labels.attire}</dt>
-                  <dd>{e.dressCode}</dd>
+                  <dd>
+                    {e.dressCode}
+                    {e.swatches && e.swatches.length > 0 && (
+                      <span
+                        class="swatches"
+                        role="img"
+                        aria-label={`${schedule.labels.swatches}: ${e.swatches.map((c) => c.label).join(", ")}`}
+                      >
+                        {e.swatches.map((c) => (
+                          <span class="swatch" title={c.label} style={`background: var(--swatch-${c.color})`} />
+                        ))}
+                      </span>
+                    )}
+                  </dd>
                 </div>
               )}
             </dl>
@@ -155,6 +168,21 @@ const { schedule } = site;
   dd {
     margin: 0 auto;
     max-width: 30rem;
+  }
+
+  /* Color bar: blocks side by side in one thin frame. */
+  .swatches {
+    display: flex;
+    max-width: 18rem;
+    height: 1.75rem;
+    margin: var(--space-2) auto 0;
+    border: 1px solid var(--border-card);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .swatch {
+    flex: 1;
   }
 
   .small {

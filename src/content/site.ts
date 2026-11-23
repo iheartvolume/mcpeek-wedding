@@ -205,7 +205,8 @@ export const site: SiteContent = {
        The start/end times are still used for the "Happening now" label.
      - end: optional. If blank, the event is treated as running until the
        next event starts, or the end of that day.
-     - Leave description or dressCode as "" to hide them. */
+     - Leave description or dressCode as "" to hide them.
+     - swatches: optional color bar under the attire text. */
   schedule: {
     title: "The Weekend",
     intro: "[A short line about the weekend's events.]",
@@ -214,6 +215,7 @@ export const site: SiteContent = {
       next: "Up next",
       where: "Where",
       attire: "Attire",
+      swatches: "Suggested colors",
     },
     events: [
       {
@@ -228,6 +230,15 @@ export const site: SiteContent = {
         description: "Join us to celebrate our union.",
         dressCode:
           "Think cocktail or semi-formal with a cozy autumn twist. We’d love to see your favorite cozy fall colors, like rust, plum, forest green, burgundy, or mustard. Please no ivory, cream, or white.",
+        // Color bar under the attire text. "color" names a --swatch-… color in tokens.css.
+        swatches: [
+          { label: "Mustard", color: "mustard" },
+          { label: "Rust", color: "rust" },
+          { label: "Burgundy", color: "burgundy" },
+          { label: "Plum", color: "plum" },
+          { label: "Navy", color: "navy" },
+          { label: "Forest green", color: "forest" },
+        ],
       },
       {
         id: "sunday-service",
