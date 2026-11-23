@@ -232,12 +232,12 @@ export const site: SiteContent = {
           "Think cocktail or semi-formal with a cozy autumn twist. We’d love to see your favorite cozy fall colors, like rust, plum, forest green, burgundy, or mustard. Please no ivory, cream, or white.",
         // Color bar under the attire text. "color" names a --swatch-… color in tokens.css.
         swatches: [
-          { label: "Mustard", color: "mustard" },
           { label: "Rust", color: "rust" },
-          { label: "Burgundy", color: "burgundy" },
-          { label: "Plum", color: "plum" },
           { label: "Navy", color: "navy" },
+          { label: "Mustard", color: "mustard" },
+          { label: "Plum", color: "plum" },
           { label: "Forest green", color: "forest" },
+          { label: "Burgundy", color: "burgundy" },
         ],
       },
       {

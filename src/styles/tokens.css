@@ -66,12 +66,12 @@
   --leaf-5: #a8482a;             /* rust */
 
   /* --- Attire color swatches (Schedule) — OWNER REVIEW ---------------- */
-  --swatch-mustard: #c99a2e;
-  --swatch-rust: #a44a2a;
-  --swatch-burgundy: #6e1a2b;
-  --swatch-plum: #6b2d5c;
-  --swatch-navy: var(--color-navy);
-  --swatch-forest: #2f4a32;
+  --swatch-mustard: #a67c25;   /* ochre mustard, not yellow */
+  --swatch-rust: #9a4a1e;      /* burnt orange */
+  --swatch-burgundy: #5a1625;
+  --swatch-plum: #3f1a35;      /* deep plum */
+  --swatch-navy: #242b44;
+  --swatch-forest: #2e3f2a;
 
   /* --- Semantic aliases: what components actually use ------------------ */
   --surface-page: var(--color-maroon);
