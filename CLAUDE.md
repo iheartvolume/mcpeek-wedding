@@ -217,9 +217,9 @@ README.md, SECRETS.md    owner-facing instructions; where secrets will live
   - The domain is **mcpeek.wedding**. Katie owns it, but it is **not set up yet**: no DNS records, nothing under Settings → Pages, and `domain` in `site.ts` is still `""`.
   - Early on, Katie mentioned verifying a domain in GitHub. Verifying alone doesn't connect it.
   - **Don't fill in `domain` until DNS is pointed at GitHub.** Setting it switches every link to the bare domain, which would break the github.io address in the meantime.
-  - **⚠ Unsure:** which registrar holds the domain.
+  - **Registrar:** Katie believes it's **Cloudflare**. Confirm when logging in.
 - **To connect the domain (in this order):**
-  1. At the registrar, add four `A` records on `mcpeek.wedding`: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, and `185.199.111.153`. Add a `CNAME` for `www.mcpeek.wedding` pointing to `iheartvolume.github.io`.
+  1. In Cloudflare (**DNS → Records**), add four `A` records on `mcpeek.wedding`: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, and `185.199.111.153`. Add a `CNAME` for `www.mcpeek.wedding` pointing to `iheartvolume.github.io`. Set every record's proxy status to **DNS only** (grey cloud). Cloudflare's proxy (orange cloud) can stop GitHub from issuing the HTTPS certificate.
   2. In GitHub, enter `mcpeek.wedding` under **Settings → Pages → Custom domain**. Tick **Enforce HTTPS** once it's offered, which can take up to a day.
   3. Put `mcpeek.wedding` in `domain:` in `src/content/site.ts` and push to `main`. This switches the base path from `/mcpeek-wedding` to `/`.
   - Because the site deploys through Actions, no `CNAME` file is needed in the repo.
