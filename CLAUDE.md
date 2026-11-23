@@ -208,7 +208,7 @@ README.md, SECRETS.md    owner-facing instructions; where secrets will live
 - **Phase 2 not started:** invite codes, RSVP per person per event, meals and dietary needs, song requests, address confirmation, an admin dashboard with CSV export, emails and reminders, and .ics calendar files. The Supabase keep-alive Action is not built yet either.
 - **Content still placeholder in `site.ts`:**
   - The contact email
-  - The schedule intro line, dress codes, and the Farewell Brunch venue and address
+  - The schedule intro line, and the Farewell Brunch venue and address
   - Hotels, Getting There notes, and Eat & Explore listings
   - `mapEmbedUrl` and `registry.url`
   - Most FAQ answers (the weather answer is real) and the RSVP message

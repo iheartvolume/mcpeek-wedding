@@ -226,7 +226,8 @@ export const site: SiteContent = {
         venue: "Trinity Lutheran Church",
         address: "3637 Golf Rd, Evanston, IL 60203",
         description: "Join us to celebrate our union.",
-        dressCode: "[Dress code]",
+        dressCode:
+          "Think cocktail or semi-formal with a cozy autumn twist. We’d love to see your favorite cozy fall colors, like rust, plum, forest green, burgundy, or mustard. Please no ivory, cream, or white.",
       },
       {
         id: "sunday-service",
@@ -239,7 +240,8 @@ export const site: SiteContent = {
         address: "3637 Golf Rd, Evanston, IL 60203",
         description:
           "We invite you to join us again at Trinity on Sunday morning for the All Saints’ service. The service will feature special music led by Phil.",
-        dressCode: "",
+        dressCode:
+          "Come as you are! Trinity is relaxed, so something comfortable and a little dressed up is perfect. Nice jeans, a sweater, a casual dress, or slacks are all welcome.",
       },
       {
         id: "brunch",
@@ -252,7 +254,8 @@ export const site: SiteContent = {
         address: "[Venue address]",
         description:
           "Join us following Trinity’s Sunday morning service for a final send-off event. Additional details closer to the event.",
-        dressCode: "[Dress code]",
+        dressCode:
+          "Totally casual. Whether you’re coming from church or straight from your hotel, come as you are.",
       },
     ],
   },
