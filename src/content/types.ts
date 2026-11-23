@@ -39,10 +39,12 @@ export interface ScheduleEvent {
   /** "HH:MM" 24-hour Chicago time, or "". */
   start: string;
   end: string;
+  /** Optional wording shown instead of the start/end times. */
+  time: string;
   venue: string;
   address: string;
+  description: string;
   dressCode: string;
-  notes: string;
 }
 
 export interface Hotel {
@@ -86,7 +88,12 @@ export interface SiteContent {
     milestones: Milestone[];
     finale: { title: string; body: string[]; photo: Photo };
   };
-  schedule: { title: string; intro: string; events: ScheduleEvent[] };
+  schedule: {
+    title: string;
+    intro: string;
+    labels: { now: string; next: string; where: string; attire: string };
+    events: ScheduleEvent[];
+  };
   travel: {
     title: string;
     intro: string;

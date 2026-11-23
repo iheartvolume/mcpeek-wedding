@@ -35,10 +35,11 @@ export const site: SiteContent = {
     mapsUrl: "https://www.google.com/maps/search/?api=1&query=Trinity+Lutheran+Church+3637+Golf+Rd+Evanston+IL+60203",
   },
 
+  // The reception follows the ceremony at the church.
   reception: {
-    venue: "[Reception venue]",
-    address: "[Reception address]",
-    mapsUrl: "",
+    venue: "Trinity Lutheran Church",
+    address: "3637 Golf Rd, Evanston, IL 60203",
+    mapsUrl: "https://www.google.com/maps/search/?api=1&query=Trinity+Lutheran+Church+3637+Golf+Rd+Evanston+IL+60203",
   },
 
   // Shown in the footer and on the FAQs page.
@@ -195,56 +196,63 @@ export const site: SiteContent = {
     },
   },
 
-  /* --- Schedule -------------------------------------------------------- */
-  // Each event's "id" must stay the same once guests are invited (Phase 2 uses it).
-  // Leave date or start/end as "" to show "to be announced".
+  /* --- Schedule --------------------------------------------------------
+     One card per event, in the order listed.
+     - id: stays the same once guests are invited (Phase 2 uses it).
+     - date: "YYYY-MM-DD". start / end: 24-hour "HH:MM", Chicago time.
+       Leave "" if not known yet; the page shows "To be announced".
+     - time: optional wording shown instead of the start/end times.
+       The start/end times are still used for the "Happening now" label.
+     - end: optional. If blank, the event is treated as running until the
+       next event starts, or the end of that day.
+     - Leave description or dressCode as "" to hide them. */
   schedule: {
     title: "The Weekend",
     intro: "[A short line about the weekend's events.]",
+    labels: {
+      now: "Happening now",
+      next: "Up next",
+      where: "Where",
+      attire: "Attire",
+    },
     events: [
       {
-        id: "rehearsal-dinner",
-        name: "Rehearsal Dinner",
-        date: "",
-        start: "",
-        end: "",
-        venue: "[Venue name]",
-        address: "[Venue address]",
-        dressCode: "[Dress code]",
-        notes: "[Notes, e.g. for the wedding party and family]",
-      },
-      {
-        id: "ceremony",
-        name: "Ceremony",
+        id: "wedding",
+        name: "Ceremony & Reception",
         date: "2027-10-30",
-        start: "",
+        start: "16:00",
         end: "",
+        time: "Ceremony begins at 4:00 PM, reception to follow",
         venue: "Trinity Lutheran Church",
         address: "3637 Golf Rd, Evanston, IL 60203",
+        description: "Join us to celebrate our union.",
         dressCode: "[Dress code]",
-        notes: "[Notes]",
       },
       {
-        id: "reception",
-        name: "Reception",
-        date: "2027-10-30",
-        start: "",
+        id: "sunday-service",
+        name: "Sunday Service",
+        date: "2027-10-31",
+        start: "09:30",
         end: "",
-        venue: "[Reception venue]",
-        address: "[Reception address]",
-        dressCode: "[Dress code]",
-        notes: "[Notes]",
+        time: "Service begins at 9:30 AM, arrive by 9:20 AM to catch the prelude",
+        venue: "Trinity Lutheran Church",
+        address: "3637 Golf Rd, Evanston, IL 60203",
+        description:
+          "We invite you to join us again at Trinity on Sunday morning for the All Saints’ service. The service will feature special music led by Phil.",
+        dressCode: "",
       },
       {
         id: "brunch",
         name: "Farewell Brunch",
-        date: "",
-        start: "",
+        date: "2027-10-31",
+        start: "11:30",
         end: "",
+        time: "",
         venue: "[Venue name]",
         address: "[Venue address]",
+        description:
+          "Join us following Trinity’s Sunday morning service for a final send-off event. Additional details closer to the event.",
         dressCode: "[Dress code]",
-        notes: "[Notes]",
       },
     ],
   },

@@ -5,7 +5,7 @@ Context for a fresh session. Items marked **⚠ Unsure** are things this project
 ## 1. What this is
 
 - A custom wedding website for **Katie and Philip**. The repo is named `mcpeek-wedding`, and the monogram is "M".
-- **Wedding:** Saturday, **October 30, 2027**. The ceremony is at **Trinity Lutheran Church, 3637 Golf Rd, Evanston, IL 60203**. The reception venue is **not decided yet** and is still a placeholder.
+- **Wedding:** Saturday, **October 30, 2027**. The ceremony is at **Trinity Lutheran Church, 3637 Golf Rd, Evanston, IL 60203**. The reception follows at the same church.
 - **Audience:** about 150 guests, many of them older and on older phones. Pages are designed for phone width first.
 - **Who edits it:**
   - Katie, the owner, is technical enough to edit the content file and the stylesheet. She is not a developer.
@@ -136,6 +136,18 @@ README.md, SECRETS.md    owner-facing instructions; where secrets will live
 - **Ending:** the timeline ends with a finale card for the wedding day. Its date comes from `site.weddingDate`, and the owner requested it.
 - **Scroll fade-in:** uses IntersectionObserver, with an inline pre-paint class and a failsafe. Everything is visible with reduced motion or without JavaScript.
 
+**Schedule**
+- **Events:** three events, as Katie set them.
+  - The **Rehearsal Dinner was cut** because it's for the wedding party and immediate family only.
+  - **The Ceremony and Reception are one listing**, since both are at Trinity.
+  - **Sunday Service** (All Saints', with music led by Phil) comes before the **Farewell Brunch**.
+- **`time` field:** optional wording shown instead of the formatted start and end times. The `start` value still drives the "Happening now" label.
+- **"Happening now" and "Up next":**
+  - They only appear between midnight on the first event's date and the end of the last event's day, in Chicago time.
+  - A blank `end` means the event runs until the next event starts, or until the end of that day.
+  - The time-zone math lives in `chicagoToUtc()` in `src/lib/dates.ts`.
+  - **Preview:** add `?preview-time=2027-10-30T17:00` (Chicago time) to the URL to see the page as it would look at that moment.
+
 **General**
 - No analytics or tracking.
 - Respect `prefers-reduced-motion` everywhere.
@@ -182,22 +194,21 @@ README.md, SECRETS.md    owner-facing instructions; where secrets will live
 
 **Naming**
 - Our Story photos are named `NN-section-description.jpg` in page order. Extra photos use letter suffixes, for example `01a-…` and `05a-…`.
-- Schedule event `id`s, such as `ceremony`, must stay stable, because Phase 2 will use them.
+- Schedule event `id`s (`wedding`, `sunday-service`, `brunch`) must stay stable, because Phase 2 will use them.
 
 **Commits:** short imperative subject lines with a body that explains the change.
 
 ## 6. Unfinished, open questions, known issues
 
-- **Step 3, pages still to polish:** Schedule (including "happening now" in Chicago time), Travel (map embed and listings), FAQs, Registry, and the RSVP placeholder. Do one page at a time, as the owner directs.
+- **Step 3:** Our Story and Schedule are done. Still to polish: Travel (map embed and listings), FAQs, Registry, and the RSVP placeholder. Do one page at a time, as the owner directs.
 - **Step 4 not started:**
   - The data model (households, guests, events, invitations, rsvps) in Supabase.
   - Two fictional seed households: one with a plus-one, one with a child.
   - The demo welcome stub: a URL demo code that shows "Welcome, [household]" and only that household's events.
 - **Phase 2 not started:** invite codes, RSVP per person per event, meals and dietary needs, song requests, address confirmation, an admin dashboard with CSV export, emails and reminders, and .ics calendar files. The Supabase keep-alive Action is not built yet either.
 - **Content still placeholder in `site.ts`:**
-  - Reception venue and address, and the contact email
-  - All event times, venues, dress codes, and notes
-  - Rehearsal dinner and brunch dates
+  - The contact email
+  - The schedule intro line, dress codes, and the Farewell Brunch venue and address
   - Hotels, Getting There notes, and Eat & Explore listings
   - `mapEmbedUrl` and `registry.url`
   - Most FAQ answers (the weather answer is real) and the RSVP message

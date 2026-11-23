@@ -10,31 +10,38 @@ const { schedule } = site;
 <BaseLayout title={schedule.title}>
   <div class="container">
     <PageTitle title={schedule.title} intro={schedule.intro} />
-    <div class="events">
+    <div class="events" data-label-now={schedule.labels.now} data-label-next={schedule.labels.next}>
       {
         schedule.events.map((e) => (
-          <article class="card event" id={e.id} data-event={e.id} data-date={e.date} data-start={e.start} data-end={e.end}>
+          <article
+            class="card event"
+            id={e.id}
+            data-event
+            data-date={e.date}
+            data-start={e.start}
+            data-end={e.end}
+          >
+            <p class="status label" data-status hidden />
             <h2 class="script">{e.name}</h2>
-            <p class="label">{formatLongDate(e.date)}</p>
-            <p class="time">{formatTimeRange(e.start, e.end)}</p>
-            <div class="divider" aria-hidden="true"><span></span></div>
+            <p class="label date">{formatLongDate(e.date)}</p>
+            <p class="time">{e.time || formatTimeRange(e.start, e.end)}</p>
+            <div class="divider" aria-hidden="true">
+              <span />
+            </div>
+            {e.description && <p class="description">{e.description}</p>}
             <dl>
               <div>
-                <dt class="label">Where</dt>
+                <dt class="label">{schedule.labels.where}</dt>
                 <dd>
                   {e.venue}
                   <br />
                   <span class="small">{e.address}</span>
                 </dd>
               </div>
-              <div>
-                <dt class="label">Attire</dt>
-                <dd>{e.dressCode}</dd>
-              </div>
-              {e.notes && (
+              {e.dressCode && (
                 <div>
-                  <dt class="label">Notes</dt>
-                  <dd>{e.notes}</dd>
+                  <dt class="label">{schedule.labels.attire}</dt>
+                  <dd>{e.dressCode}</dd>
                 </div>
               )}
             </dl>
@@ -45,6 +52,70 @@ const { schedule } = site;
   </div>
 </BaseLayout>
 
+<script>
+  /* "Happening now" / "Up next": only during the wedding weekend, in Chicago time.
+     Preview any moment with ?preview-time=2027-10-30T16:30 (Chicago time). */
+  import { chicagoToUtc } from "../lib/dates";
+
+  const list = document.querySelector<HTMLElement>(".events");
+  const cards = Array.from(document.querySelectorAll<HTMLElement>("[data-event]"));
+
+  type Slot = { card: HTMLElement; status: HTMLElement; start: number; end: number };
+  const slots: Slot[] = [];
+
+  for (const card of cards) {
+    const { date, start } = card.dataset;
+    if (!date || !start) continue;
+    slots.push({ card, status: card.querySelector<HTMLElement>("[data-status]")!, start: chicagoToUtc(date, start), end: 0 });
+  }
+  slots.sort((a, b) => a.start - b.start);
+
+  // A blank end means "until the next event starts, or the end of that day".
+  slots.forEach((slot, i) => {
+    const { date = "", end = "" } = slot.card.dataset;
+    const endOfDay = chicagoToUtc(date, "23:59") + 60_000;
+    const next = slots[i + 1];
+    slot.end = end ? chicagoToUtc(date, end) : Math.min(endOfDay, next && next.start > slot.start ? next.start : endOfDay);
+  });
+
+  const dates = cards.map((c) => c.dataset.date).filter(Boolean).sort() as string[];
+  const weekendStart = dates.length ? chicagoToUtc(dates[0], "00:00") : 0;
+  const weekendEnd = dates.length ? chicagoToUtc(dates[dates.length - 1], "23:59") + 60_000 : 0;
+
+  const preview = new URLSearchParams(location.search).get("preview-time");
+  const now = () => {
+    if (preview) {
+      const [d, t] = preview.split("T");
+      return chicagoToUtc(d, t || "00:00");
+    }
+    return Date.now();
+  };
+
+  function update() {
+    const t = now();
+    let current: Slot | undefined;
+    let upcoming: Slot | undefined;
+    if (t >= weekendStart && t < weekendEnd) {
+      current = slots.find((s) => t >= s.start && t < s.end);
+      if (!current) upcoming = slots.find((s) => s.start > t);
+    }
+    for (const s of slots) {
+      const label = s === current ? list?.dataset.labelNow : s === upcoming ? list?.dataset.labelNext : "";
+      s.card.classList.toggle("is-now", s === current);
+      s.card.classList.toggle("is-next", s === upcoming);
+      s.status.hidden = !label;
+      s.status.textContent = label ?? "";
+    }
+  }
+
+  if (slots.length && list) {
+    update();
+    // Keep it current during the weekend (checks once a minute; idle otherwise).
+    const t = now();
+    if (!preview && t >= weekendStart - 86_400_000 && t < weekendEnd) setInterval(update, 60_000);
+  }
+</script>
+
 <style>
   .events {
     display: grid;
@@ -53,14 +124,22 @@ const { schedule } = site;
 
   .event {
     text-align: center;
+    transition: box-shadow var(--duration-slow) var(--ease-soft);
   }
 
-  .event > .label {
+  .date {
     margin-bottom: var(--space-1);
   }
 
   .time {
     font-style: italic;
+    max-width: 26rem;
+    margin-inline: auto;
+  }
+
+  .description {
+    max-width: 30rem;
+    margin: 0 auto var(--space-3);
   }
 
   dl {
@@ -79,5 +158,30 @@ const { schedule } = site;
 
   .small {
     font-size: var(--text-sm);
+  }
+
+  /* --- Wedding weekend highlight --------------------------------------- */
+  .status {
+    display: inline-block;
+    margin: 0 0 var(--space-2);
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    background: var(--text-on-card);
+    color: var(--surface-card);
+    font-size: 0.75rem;
+  }
+
+  .status[hidden] {
+    display: none;
+  }
+
+  .event.is-now {
+    box-shadow:
+      0 0 0 2px var(--accent),
+      0 0 32px 6px var(--glow-color);
+  }
+
+  .event.is-next {
+    box-shadow: 0 0 0 1px var(--accent);
   }
 </style>
