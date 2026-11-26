@@ -229,7 +229,7 @@ export const site: SiteContent = {
         address: "3637 Golf Rd, Evanston, IL 60203",
         description: "Join us to celebrate our union.",
         dressCode:
-          "Think cocktail or semi-formal with a cozy autumn twist. We’d love to see your favorite cozy fall colors, like rust, plum, forest green, burgundy, or mustard. Please no ivory, cream, or white.",
+          "Think cocktail or semi-formal with a cozy autumn twist. We’d love to see your favorite cozy fall colors. Examples: Rust, navy, mustard, plum, forest green, burgundy, or any other fall colors that speak to you. Please no ivory, cream, or white.",
         // Color bar under the attire text. "color" names a --swatch-… color in tokens.css.
         swatches: [
           { label: "Rust", color: "rust" },
