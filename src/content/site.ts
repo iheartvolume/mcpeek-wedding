@@ -253,7 +253,7 @@ export const site: SiteContent = {
         venue: "Trinity Lutheran Church",
         address: "3637 Golf Rd, Evanston, IL 60203",
         description:
-          "Phil will be leading special music at Trinity’s service on Sunday morning, including Katie on saxophone, and we’d love for you to hear it. You don’t need to be religious to come enjoy the music. Everyone is welcome, whatever you believe or don’t.",
+          "Phil will be leading special music at Trinity’s service on Sunday morning, including Katie on saxophone, and we’d love for you to hear it. All are welcome!",
         dressCode:
           "Come as you are! Trinity is relaxed, so something comfortable and a little dressed up is perfect. Nice jeans, a sweater, a casual dress, or slacks are all welcome.",
       },
