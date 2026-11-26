@@ -140,7 +140,7 @@ README.md, SECRETS.md    owner-facing instructions; where secrets will live
 - **Events:** three events, as Katie set them.
   - The **Rehearsal Dinner was cut** because it's for the wedding party and immediate family only.
   - **The Ceremony and Reception are one listing**, since both are at Trinity.
-  - **Sunday Service** (All Saints', with music led by Phil) comes before the **Farewell Brunch**.
+  - **Sunday Service** (Trinity's Sunday morning service, with special music led by Phil and Katie on saxophone; all guests welcome) comes before the **Farewell Brunch**.
 - **`time` field:** optional wording shown instead of the formatted start and end times. The `start` value still drives the "Happening now" label.
 - **"Happening now" and "Up next":**
   - They only appear between midnight on the first event's date and the end of the last event's day, in Chicago time.
