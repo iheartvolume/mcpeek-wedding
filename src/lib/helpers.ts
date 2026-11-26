@@ -15,6 +15,12 @@ export function isPlaceholder(value: string): boolean {
   return value.trim() === "" || value.trim().startsWith("[");
 }
 
+/** A Google Maps search link for a place, e.g. venue name plus street address. */
+export function mapsLink(venue: string, address: string): string {
+  const query = [venue, address].filter((v) => !isPlaceholder(v)).join(", ");
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
 /** "Saturday, October 30, 2027" */
 export function formatLongDate(ymd: string): string {
   if (!ymd) return site.meta.tba;

@@ -141,6 +141,7 @@ README.md, SECRETS.md    owner-facing instructions; where secrets will live
   - The **Rehearsal Dinner was cut** because it's for the wedding party and immediate family only.
   - **The Ceremony and Reception are one listing**, since both are at Trinity.
   - **Sunday Service** (Trinity's Sunday morning service, with special music led by Phil and Katie on saxophone; all guests welcome) comes before the **Farewell Brunch**.
+- **Map links:** any real event address links to a Google Maps search (`mapsLink()` in `src/lib/helpers.ts`) and opens in a new tab. The link keeps the text color and is underlined.
 - **`time` field:** optional wording shown instead of the formatted start and end times. The `start` value still drives the "Happening now" label.
 - **"Happening now" and "Up next":**
   - They only appear between midnight on the first event's date and the end of the last event's day, in Chicago time.
@@ -208,7 +209,7 @@ README.md, SECRETS.md    owner-facing instructions; where secrets will live
 - **Phase 2 not started:** invite codes, RSVP per person per event, meals and dietary needs, song requests, address confirmation, an admin dashboard with CSV export, emails and reminders, and .ics calendar files. The Supabase keep-alive Action is not built yet either.
 - **Content still placeholder in `site.ts`:**
   - The contact email
-  - The schedule intro line, and the Farewell Brunch venue and address
+  - The schedule intro line. The Farewell Brunch venue reads "TBD" until it's decided.
   - Hotels, Getting There notes, and Eat & Explore listings
   - `mapEmbedUrl` and `registry.url`
   - Most FAQ answers (the weather answer is real) and the RSVP message

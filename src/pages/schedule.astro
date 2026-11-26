@@ -2,7 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PageTitle from "../components/PageTitle.astro";
 import { site } from "../content/site";
-import { formatLongDate, formatTimeRange } from "../lib/helpers";
+import { formatLongDate, formatTimeRange, isPlaceholder, mapsLink } from "../lib/helpers";
 
 const { schedule } = site;
 ---
@@ -34,8 +34,19 @@ const { schedule } = site;
                 <dt class="label">{schedule.labels.where}</dt>
                 <dd>
                   {e.venue}
-                  <br />
-                  <span class="small">{e.address}</span>
+                  {e.address && (
+                    <>
+                      <br />
+                      {isPlaceholder(e.address) ? (
+                        <span class="small">{e.address}</span>
+                      ) : (
+                        <a class="small" href={mapsLink(e.venue, e.address)} target="_blank" rel="noopener">
+                          {e.address}
+                          <span class="visually-hidden"> {schedule.labels.mapsHint}</span>
+                        </a>
+                      )}
+                    </>
+                  )}
                 </dd>
               </div>
               {e.dressCode && (

@@ -206,7 +206,9 @@ export const site: SiteContent = {
      - end: optional. If blank, the event is treated as running until the
        next event starts, or the end of that day.
      - Leave description or dressCode as "" to hide them.
-     - swatches: optional color bar under the attire text. */
+     - swatches: optional color bar under the attire text.
+     - A real address automatically links to Google Maps. Leave address
+       "" to hide it. */
   schedule: {
     title: "The Weekend",
     intro: "[A short line about the weekend's events.]",
@@ -216,6 +218,7 @@ export const site: SiteContent = {
       where: "Where",
       attire: "Attire",
       swatches: "Suggested colors",
+      mapsHint: "(opens Google Maps in a new tab)",
     },
     events: [
       {
@@ -261,8 +264,8 @@ export const site: SiteContent = {
         start: "11:30",
         end: "",
         time: "",
-        venue: "[Venue name]",
-        address: "[Venue address]",
+        venue: "TBD",
+        address: "",
         description:
           "Join us following Trinity’s Sunday morning service for a final send-off event. Additional details closer to the event.",
         dressCode:

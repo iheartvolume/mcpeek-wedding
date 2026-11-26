@@ -93,7 +93,7 @@ export interface SiteContent {
   schedule: {
     title: string;
     intro: string;
-    labels: { now: string; next: string; where: string; attire: string; swatches: string };
+    labels: { now: string; next: string; where: string; attire: string; swatches: string; mapsHint: string };
     events: ScheduleEvent[];
   };
   travel: {
