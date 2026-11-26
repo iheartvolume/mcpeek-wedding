@@ -51,10 +51,13 @@ export interface ScheduleEvent {
 
 export interface Hotel {
   name: string;
-  distance: string;
-  price: string;
+  address: string;
+  phone: string;
   url: string;
-  note: string;
+  parking: string;
+  breakfast: string;
+  location: string;
+  goodToKnow: string;
 }
 
 export interface ExploreItem {
@@ -99,16 +102,27 @@ export interface SiteContent {
   travel: {
     title: string;
     intro: string;
+    notice: { eyebrow: string; title: string; text: string; action: string };
+    notesTitle: string;
+    notes: { heading: string; text: string[] }[];
     accommodationsTitle: string;
-    accommodationsIntro: string;
-    hotels: Hotel[];
+    hotelLabels: {
+      parking: string;
+      breakfast: string;
+      location: string;
+      goodToKnow: string;
+      website: string;
+      maps: string;
+    };
+    hotelGroups: { town: string; hotels: Hotel[] }[];
     gettingThereTitle: string;
     gettingThere: { heading: string; text: string }[];
     exploreTitle: string;
     exploreGroups: { category: string; items: ExploreItem[] }[];
-    mapTitle: string;
     mapEmbedUrl: string;
-    mapPlaceholder: string;
+    mapLink: string;
+    mapLinkLabel: string;
+    mapTitle: string;
   };
   registry: { title: string; message: string; url: string; buttonLabel: string };
   faqs: { title: string; intro: string; items: { q: string; a: string }[] };

@@ -274,75 +274,118 @@ export const site: SiteContent = {
     ],
   },
 
-  /* --- Travel ---------------------------------------------------------- */
+  /* --- Travel ----------------------------------------------------------
+     The page shows, in order: the notice (a highlighted callout), the
+     notes card, hotels grouped by town, Getting There with the map, and
+     Eat & Explore (hidden while exploreGroups is empty). */
   travel: {
     title: "Travel & Stay",
-    intro: "[A short welcome for out-of-town guests.]",
+    intro: "",
+
+    notice: {
+      eyebrow: "Please note",
+      title: "Football Season",
+      text: "Northwestern home games can fill Evanston and Skokie hotels and raise rates. We won’t know whether there is a home game the weekend of October 30 until mid-year.",
+      action: "We recommend you book early with free cancellation if possible.",
+    },
+
+    notesTitle: "For Out-of-Town Guests",
+    notes: [
+      {
+        heading: "No Room Block",
+        text: ["Please choose the hotel that works best for you! The four hotels below are a few of many good options in the area."],
+      },
+      {
+        heading: "Skokie vs. Evanston",
+        text: [
+          "Trinity Lutheran Church borders Skokie and Evanston, so we’ve suggested hotels in both towns.",
+          "Skokie hotels are easier to drive from and have free parking. If you’re driving in, these hotels are close to the highway and more convenient.",
+          "Evanston hotels are better for CTA/Metra transit if you want to explore or go into Chicago. Evanston is pretty and walkable, but downtown Evanston driving and parking can be a hassle. Consider rideshare for these hotels.",
+        ],
+      },
+      {
+        heading: "Airport",
+        text: ["O’Hare is roughly 25 to 40 minutes by car, depending on traffic. We recommend rideshare to and from the airport."],
+      },
+    ],
 
     accommodationsTitle: "Where to Stay",
-    accommodationsIntro:
-      "A few nearby hotels we recommend. There is no room block, so please book directly.",
-    hotels: [
+    hotelLabels: {
+      parking: "Parking",
+      breakfast: "Breakfast",
+      location: "Location",
+      goodToKnow: "Good to know",
+      website: "(opens the hotel’s website in a new tab)",
+      maps: "(opens Google Maps in a new tab)",
+    },
+    hotelGroups: [
       {
-        name: "[Hotel name]",
-        distance: "[Distance to the ceremony]",
-        price: "[Price tier, e.g. $$]",
-        url: "",
-        note: "[Short note]",
+        town: "Skokie",
+        hotels: [
+          {
+            name: "DoubleTree by Hilton Hotel Chicago – North Shore Conference Center",
+            address: "9599 Skokie Boulevard, Skokie, IL 60077",
+            phone: "(847) 679-7000",
+            url: "https://www.hilton.com/en/hotels/chiccdt-doubletree-chicago-north-shore-conference-center/",
+            parking: "Free on-site parking, plenty of spaces available.",
+            breakfast: "Not included. A full breakfast is available for a fee (6:30 to 10:00 AM). The on-site restaurant is Jameson’s Charhouse. There’s a Panera directly across the street as well.",
+            location: "Across from Westfield Old Orchard (shops and restaurants). About 10 minutes straight down Golf Rd. to the church by car. Public transportation is less accessible. O’Hare is about 25 minutes by car.",
+            goodToKnow: "Indoor and seasonal outdoor pools.",
+          },
+          {
+            name: "Hampton Inn & Suites Chicago-North Shore/Skokie",
+            address: "5201 Old Orchard Road, Skokie, IL 60077",
+            phone: "(847) 583-1111",
+            url: "https://www.hilton.com/en/hotels/chiskhx-hampton-suites-chicago-north-shore-skokie/",
+            parking: "Free self-parking.",
+            breakfast: "Free hot breakfast every morning.",
+            location: "Off I-94, about two blocks from Westfield Old Orchard (shops and restaurants). About 10 minutes to the church by car. Public transportation is less accessible. O’Hare is about 25 minutes by car.",
+            goodToKnow: "Indoor pool and fitness center.",
+          },
+        ],
       },
       {
-        name: "[Hotel name]",
-        distance: "[Distance to the ceremony]",
-        price: "[Price tier, e.g. $$$]",
-        url: "",
-        note: "[Short note]",
-      },
-      {
-        name: "[Hotel name]",
-        distance: "[Distance to the ceremony]",
-        price: "[Price tier, e.g. $$]",
-        url: "",
-        note: "[Short note]",
+        town: "Evanston",
+        hotels: [
+          {
+            name: "Hyatt House Chicago/Evanston",
+            address: "1515 Chicago Avenue, Evanston, IL",
+            phone: "(847) 864-2300",
+            url: "https://www.hyatt.com/hyatt-house/en-US/chixe-hyatt-house-chicago-evanston",
+            parking: "On-site self-parking is $25 per night. Spaces may be limited.",
+            breakfast: "Free full breakfast.",
+            location: "Downtown Evanston, about 15 minutes to the church by car. The CTA Purple Line is about a 5-minute walk and Lake Michigan beaches about a 10-minute walk. You can take the CTA Purple Line to the Red Line to go into the city.",
+            goodToKnow: "Walkable to downtown Evanston restaurants, Northwestern’s campus, and the lakefront, so you can explore without a car.",
+          },
+          {
+            name: "Hilton Garden Inn Chicago North Shore/Evanston",
+            address: "1818 Maple Avenue, Evanston, IL 60201",
+            phone: "(847) 475-6400",
+            url: "https://www.hilton.com/en/hotels/ordevgi-hilton-garden-inn-chicago-north-shore-evanston/",
+            parking: "Covered self-parking is $24 per night with in/out privileges. Spaces may be limited.",
+            breakfast: "Not included. There is a paid breakfast buffet, and downtown Evanston has coffee shops.",
+            location: "Downtown Evanston, about 15 minutes to the church by car. The Davis Street station (CTA and Metra) is about a 4-minute walk, so it’s easy to get into Chicago for sightseeing.",
+            goodToKnow: "Indoor pool, restaurant, and a lobby fireplace. Close to downtown Evanston shops and restaurants.",
+          },
+        ],
       },
     ],
 
-    gettingThereTitle: "Getting There",
+    gettingThereTitle: "Getting to Trinity",
     gettingThere: [
-      { heading: "Flying into O'Hare", text: "[Notes about O'Hare: distance, typical drive time, transit options.]" },
-      { heading: "Flying into Midway", text: "[Notes about Midway: distance, typical drive time, transit options.]" },
-      { heading: "Parking at the Church", text: "[Parking notes for Trinity Lutheran Church.]" },
-      { heading: "Rideshare & Transit", text: "[Rideshare and public transit notes.]" },
+      { heading: "Parking", text: "There’s plenty of parking both in front of and behind the church." },
     ],
 
+    // Eat & Explore: add groups here later; the section is hidden while empty.
     exploreTitle: "Eat & Explore",
-    exploreGroups: [
-      {
-        category: "Restaurants",
-        items: [
-          { name: "[Restaurant name]", note: "[Why you love it]", url: "" },
-          { name: "[Restaurant name]", note: "[Why you love it]", url: "" },
-        ],
-      },
-      {
-        category: "Coffee & Sweets",
-        items: [
-          { name: "[Café name]", note: "[Why you love it]", url: "" },
-          { name: "[Bakery name]", note: "[Why you love it]", url: "" },
-        ],
-      },
-      {
-        category: "Things to Do",
-        items: [
-          { name: "[Sight or activity]", note: "[Short note]", url: "" },
-          { name: "[Sight or activity]", note: "[Short note]", url: "" },
-        ],
-      },
-    ],
+    exploreGroups: [],
 
-    mapTitle: "Map",
-    // Paste ONLY the src="..." address from your Google My Maps embed code.
+    // Map: paste ONLY the src="..." address from a Google My Maps embed code
+    // into mapEmbedUrl. Until then, the button below links to the map instead.
     mapEmbedUrl: "",
-    mapPlaceholder: "[Map coming soon]",
+    mapLink: "https://maps.app.goo.gl/YyJCVYFLQHB35Qmk6",
+    mapLinkLabel: "Open our map in Google Maps",
+    mapTitle: "Our map of the area",
   },
 
   /* --- Registry -------------------------------------------------------- */

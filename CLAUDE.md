@@ -149,6 +149,12 @@ README.md, SECRETS.md    owner-facing instructions; where secrets will live
   - The time-zone math lives in `chicagoToUtc()` in `src/lib/dates.ts`.
   - **Preview:** add `?preview-time=2027-10-30T17:00` (Chicago time) to the URL to see the page as it would look at that moment.
 
+**Travel**
+- **Order:** the Football Season notice (a gold-framed callout), then the "For Out-of-Town Guests" notes, then hotels grouped by town (Skokie, Evanston), then Getting to Trinity (parking and the map).
+- **No accordion:** Katie wanted everyone to see the notes, especially the football note, so everything is visible. An accordion was ruled out because guests often skip collapsed sections.
+- **Hotels:** each has a name (linked to its website), an address (linked to Google Maps), a phone number (a `tel:` link), and Parking, Breakfast, Location, and Good to know. The original brief's distance and price-tier fields were dropped, since the Location text covers distance.
+- **Map:** Katie's map is a `maps.app.goo.gl` short link, which is blocked from the cloud environment, so it couldn't be turned into an embed. The page shows an "Open our map in Google Maps" button until `mapEmbedUrl` is set.
+
 **General**
 - No analytics or tracking.
 - Respect `prefers-reduced-motion` everywhere.
@@ -201,7 +207,7 @@ README.md, SECRETS.md    owner-facing instructions; where secrets will live
 
 ## 6. Unfinished, open questions, known issues
 
-- **Step 3:** Our Story and Schedule are done. Still to polish: Travel (map embed and listings), FAQs, Registry, and the RSVP placeholder. Do one page at a time, as the owner directs.
+- **Step 3:** Our Story and Schedule are done, and Travel is mostly done (see below). Still to polish: FAQs, Registry, and the RSVP placeholder. Do one page at a time, as the owner directs.
 - **Step 4 not started:**
   - The data model (households, guests, events, invitations, rsvps) in Supabase.
   - Two fictional seed households: one with a plus-one, one with a child.
@@ -210,8 +216,8 @@ README.md, SECRETS.md    owner-facing instructions; where secrets will live
 - **Content still placeholder in `site.ts`:**
   - The contact email
   - The schedule intro line. The Farewell Brunch venue reads "TBD" until it's decided.
-  - Hotels, Getting There notes, and Eat & Explore listings
-  - `mapEmbedUrl` and `registry.url`
+  - Travel: `mapEmbedUrl` (a button to the Google Maps link stands in for now). Eat & Explore is empty and hidden until Katie sends places.
+  - `registry.url`
   - Most FAQ answers (the weather answer is real) and the RSVP message
 - **Waiting on the owner:** optional watercolor leaf sprite PNGs. The owner said they will come back to these; they would go in `leaves.spriteImages`.
 - **Domain:** not connected yet; see section 7.
